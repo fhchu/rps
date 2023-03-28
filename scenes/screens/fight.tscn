@@ -1,0 +1,106 @@
+[gd_scene load_steps=4 format=3 uid="uid://dnjrt0lngoro"]
+
+[ext_resource type="Texture2D" uid="uid://bep1015jkmd0" path="res://assets/player sprites/cat.png" id="1_6l72s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u1jpp"]
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+expand_margin_left = 1.0
+expand_margin_top = 1.0
+expand_margin_right = 1.0
+expand_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_npn0w"]
+bg_color = Color(0, 0.835294, 0, 1)
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 15
+corner_radius_bottom_left = 15
+
+[node name="fight" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="HBoxContainer" parent="."]
+layout_mode = 2
+offset_bottom = 648.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="ColorRect2" type="ColorRect" parent="Control/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxContainer/ColorRect2"]
+layout_mode = 0
+offset_right = 21.0
+offset_bottom = 17.0
+text = "R: 1"
+
+[node name="ColorRect" type="ColorRect" parent="Control/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxContainer/ColorRect"]
+layout_mode = 0
+offset_right = 21.0
+offset_bottom = 17.0
+text = "R: 1"
+
+[node name="ProgressBar" type="ProgressBar" parent="Control/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_u1jpp")
+theme_override_styles/fill = SubResource("StyleBoxFlat_npn0w")
+step = 1.0
+value = 50.0
+allow_greater = true
+show_percentage = false
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/ProgressBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 48
+text = "0/3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Control/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("1_6l72s")
+stretch_mode = 3
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 2
+offset_left = 582.0
+offset_right = 1152.0
+offset_bottom = 648.0
+size_flags_horizontal = 3
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 2
+offset_left = 4.0
+offset_right = 4.0
+offset_bottom = 648.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.282353, 0.505882, 0.752941, 1)

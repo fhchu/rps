@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="rps"
-config/features=PackedStringArray("4.0", "GL Compatibility")
+run/main_scene="res://scenes/screens/main_menu.tscn"
+config/features=PackedStringArray("4.0", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[display]
+
+window/vsync/vsync_mode=0
 
 [dotnet]
 
@@ -22,6 +27,10 @@ project/assembly_name="rps"
 
 version_control/plugin_name="GitPlugin"
 version_control/autoload_on_startup=true
+
+[gui]
+
+theme/custom_font="res://assets/HelvetiPixel.ttf"
 
 [rendering]
 
