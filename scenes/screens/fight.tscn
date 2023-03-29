@@ -1,6 +1,24 @@
-[gd_scene load_steps=4 format=3 uid="uid://dnjrt0lngoro"]
+[gd_scene load_steps=11 format=3 uid="uid://dnjrt0lngoro"]
 
 [ext_resource type="Texture2D" uid="uid://bep1015jkmd0" path="res://assets/player sprites/cat.png" id="1_6l72s"]
+[ext_resource type="Script" path="res://scenes/screens/fight.cs" id="1_8ieqv"]
+[ext_resource type="FontFile" uid="uid://hl6niy0yebwr" path="res://assets/HelvetiPixel.ttf" id="1_ysk8r"]
+[ext_resource type="Theme" uid="uid://bumnwnco8nxol" path="res://theme.tres" id="4_rvgd2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scxvc"]
+bg_color = Color(0, 0, 0, 0.513726)
+
+[sub_resource type="Theme" id="Theme_2sp6e"]
+default_font = ExtResource("1_ysk8r")
+default_font_size = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_is2nf"]
+bg_color = Color(0.286275, 0.701961, 0.313726, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.160784, 0.298039, 0.156863, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u1jpp"]
 border_width_left = 1
@@ -23,6 +41,8 @@ border_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 15
 corner_radius_bottom_left = 15
 
+[sub_resource type="Theme" id="Theme_ix2i3"]
+
 [node name="fight" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -30,38 +50,64 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_8ieqv")
 
-[node name="Control" type="HBoxContainer" parent="."]
-layout_mode = 2
-offset_bottom = 648.0
+[node name="LocalHBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+[node name="PlayerVBox0" type="VBoxContainer" parent="LocalHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Control/VBoxContainer"]
+[node name="AttacksPanel" type="Panel" parent="LocalHBox/PlayerVBox0"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_scxvc")
 
-[node name="ColorRect2" type="ColorRect" parent="Control/VBoxContainer/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="LocalHBox/PlayerVBox0/AttacksPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="RockButton" type="Button" parent="LocalHBox/PlayerVBox0/AttacksPanel/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme = SubResource("Theme_2sp6e")
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_is2nf")
+text = "Rock:"
 
-[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxContainer/ColorRect2"]
-layout_mode = 0
-offset_right = 21.0
-offset_bottom = 17.0
-text = "R: 1"
-
-[node name="ColorRect" type="ColorRect" parent="Control/VBoxContainer/HBoxContainer"]
+[node name="RockButton2" type="Button" parent="LocalHBox/PlayerVBox0/AttacksPanel/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme = SubResource("Theme_2sp6e")
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0.933333, 0.0313726, 0.603922)
+theme_override_constants/outline_size = 1
+text = "Rock:"
 
-[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxContainer/ColorRect"]
-layout_mode = 0
-offset_right = 21.0
-offset_bottom = 17.0
-text = "R: 1"
+[node name="RockButton3" type="Button" parent="LocalHBox/PlayerVBox0/AttacksPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = SubResource("Theme_2sp6e")
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/icon_normal_color = Color(0, 0.933333, 0.0313726, 0.603922)
+theme_override_constants/outline_size = 1
+text = "Rock:"
 
-[node name="ProgressBar" type="ProgressBar" parent="Control/VBoxContainer"]
+[node name="HealthBar" type="ProgressBar" parent="LocalHBox/PlayerVBox0"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_u1jpp")
@@ -71,7 +117,7 @@ value = 50.0
 allow_greater = true
 show_percentage = false
 
-[node name="Label" type="Label" parent="Control/VBoxContainer/ProgressBar"]
+[node name="Label" type="Label" parent="LocalHBox/PlayerVBox0/HealthBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -79,28 +125,61 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_ysk8r")
 theme_override_font_sizes/font_size = 48
 text = "0/3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="Control/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="LocalHBox/PlayerVBox0"]
 layout_mode = 2
 texture = ExtResource("1_6l72s")
 stretch_mode = 3
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+[node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox0"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-offset_left = 582.0
-offset_right = 1152.0
-offset_bottom = 648.0
-size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_scxvc")
 
-[node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 2
-offset_left = 4.0
-offset_right = 4.0
-offset_bottom = 648.0
+[node name="HBoxContainer" type="HBoxContainer" parent="LocalHBox/PlayerVBox0/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.282353, 0.505882, 0.752941, 1)
+alignment = 1
+
+[node name="Label" type="Label" parent="LocalHBox/PlayerVBox0/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme = SubResource("Theme_ix2i3")
+text = "Player"
+vertical_alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="LocalHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GameLog" type="Panel" parent="."]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="GameLog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("4_rvgd2")
+text = "Begin"
+horizontal_alignment = 1
+vertical_alignment = 1
