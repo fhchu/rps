@@ -10,11 +10,12 @@ public partial class fight : Control
     const int NUM_PLAYERS = 2;
     public enum Hand { Rock, Paper, Scissors }
 
-    Player[] players;
-    int[] roundHealth = { 3, 7, 11 };
-    int totalRounds;
-    int currentRound;
-    bool combatIsOn;
+    private Player[] players;
+    private List<RoundResult> roundResults;
+    private int[] roundHealth = { 3, 7, 11 };
+    private int totalRounds;
+    private int currentRound;
+    private bool combatIsOn;
 
     Panel gameLog;
 
@@ -27,6 +28,7 @@ public partial class fight : Control
         currentRound = 0;
         totalRounds = 3;
         setUpPlayers();
+        roundResults = new List<RoundResult>();
         startRound(roundHealth[currentRound]);
     }
 
@@ -82,7 +84,6 @@ public partial class fight : Control
 
             players[i] = player;
             updateHands(player, 1, 1, 1);
-
         }
     }
 
@@ -169,6 +170,8 @@ public partial class fight : Control
         {
             endRound(player);
         }
+
+        return false;
     }
 
     //updates the player's hand power
@@ -202,7 +205,6 @@ public partial class fight : Control
         public int maxHealth;
         public int currentHealth;
         public int[] handValues;
-        public List<Hand> handHistory;
         public PowerUp[] powerUps;
         public Hand thrownHand;
         public bool hasThrown;
@@ -210,22 +212,30 @@ public partial class fight : Control
         {
             VBoxPath = path;
             handValues = new int[3];
-            handHistory = new List<Hand>();
             hasThrown = false;
         }
 
         public void calculateHandValues()
         {
+            int[] handModifiers = new int[3];
+            foreach (PowerUp power in powerUps)
+            {
+                power.calculateDamage();
+            }
 
         }
     }
 
-
+    public class RoundResult
+    {
+        public Hand[] playerHands;
+        public int[] damage;
+    }
     public class PowerUp
     {
-        void process(Player player)
+        public int[] calculateDamage()
         {
-
+            return new int[3];
         }
     }
 }

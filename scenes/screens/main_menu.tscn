@@ -53,7 +53,7 @@ layout_mode = 2
 theme = ExtResource("2_kdaii")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 84
-text = "Start
+text = "Throw hands
 "
 
 [node name="OptionsHBox" type="HBoxContainer" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox"]
