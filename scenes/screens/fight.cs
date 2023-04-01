@@ -12,9 +12,10 @@ public partial class fight : Control
 
     private Player[] players;
     private List<RoundResult> roundResults;
-    private int[] roundHealth = { 3, 7, 11 };
-    private int totalRounds;
-    private int currentRound;
+    // this is an array because we might want more rounds in the future
+    private int[] phaseHealth = { 20 };
+    private int totalPhases = 1;
+    private int currentPhase;
     private bool combatIsOn;
 
     Panel gameLog;
@@ -23,13 +24,13 @@ public partial class fight : Control
     public override void _Ready()
     {
         gameLog = (Panel)GetNode("GameLog");
-        //gameLog.Hide();
+        gameLog.Hide();
 
-        currentRound = 0;
-        totalRounds = 3;
+        // we might want to have multiple phases one day
+        currentPhase = 0;
         setUpPlayers();
         roundResults = new List<RoundResult>();
-        startRound(roundHealth[currentRound]);
+        startPhase(phaseHealth[currentPhase]);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -74,7 +75,8 @@ public partial class fight : Control
         }
     }
 
-    // build players before round 0
+    // build players before game starts.
+    // we set HP 
     private void setUpPlayers()
     {
         players = new Player[NUM_PLAYERS];
@@ -83,23 +85,26 @@ public partial class fight : Control
             Player player = new Player(PLAYER_NODE_PATH + i);
 
             players[i] = player;
-            updateHands(player, 1, 1, 1);
+            // player does not handle setting of their own powers
+            setAllHands(player, 1, 1, 1);
+            // perhaps we can have different upgrade thresholds per player? 
+            player.upgradeThresholds = new int[] {3, 10};
         }
     }
 
     // sets up fighting once upgrades have been taken
-    private void startRound(int roundHealth)
+    private void startPhase(int phaseHealth)
     {
-        currentRound += 1;
+        currentPhase += 1;
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
             Player player = players[i];
-            player.maxHealth = roundHealth;
+            player.maxHealth = phaseHealth;
 
             String healthBarControl = player.VBoxPath + "/HealthBar";
             ProgressBar healthBar = (ProgressBar)GetNode(healthBarControl);
-            healthBar.MaxValue = roundHealth;
-            updateHealth(player, roundHealth);
+            healthBar.MaxValue = phaseHealth;
+            updateHealth(player, phaseHealth);
         }
         waitForHands();
     }
@@ -134,7 +139,7 @@ public partial class fight : Control
             winner = player1;
             loser = player0;
         }
-        if (updateHealth(loser, loser.currentHealth - winner.handValues[(int)winner.thrownHand]))
+        if (updateHealth(loser, loser.currentHealth - winner.baseHandValues[(int)winner.thrownHand]))
         {
 
         }
@@ -142,16 +147,16 @@ public partial class fight : Control
         loser.calculateHandValues();
     }
 
-    private void endRound(Player loser)
+    private void endPhase(Player loser)
     {
-        // if (currentRound == totalRounds)
-        //{
-        //TODO move this to "end game" function if necessary
-        gameLogDisplay("Game Over!");
-        TextureRect loserPic = (TextureRect)GetNode(loser.VBoxPath).GetNode("TextureRect");
-        loserPic.FlipV = true;
-        combatIsOn = false;
-        //}
+        if (currentPhase == totalPhases)
+        {
+            //TODO move this to "end game" function if necessary
+            gameLogDisplay("Game Over!");
+            TextureRect loserPic = (TextureRect)GetNode(loser.VBoxPath).GetNode("TextureRect");
+            loserPic.FlipV = true;
+            combatIsOn = false;
+        }
     }
 
 
@@ -168,28 +173,28 @@ public partial class fight : Control
 
         if (player.currentHealth <= 0)
         {
-            endRound(player);
+            endPhase(player);
         }
 
         return false;
     }
 
-    //updates the player's hand power
-    private void updateHandPower(Player player, Hand hand, int value)
+    //updates the player's hand power in backend and UI
+    private void setBaseHandPower(Player player, Hand hand, int value)
     {
         String handName = hand.ToString();
-        player.handValues[(int)hand] = value;
+        player.baseHandValues[(int)hand] = value;
         Button handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + handName + "Button");
         handButton.Text = handName + ": " + value;
-        //TODO if it's updated, change the color to green
     }
 
+
     //update all 3 hands at once
-    private void updateHands(Player player, int rockValue, int paperValue, int scissorsValue)
+    private void setAllHands(Player player, int rockValue, int paperValue, int scissorsValue)
     {
-        updateHandPower(player, Hand.Rock, rockValue);
-        updateHandPower(player, Hand.Paper, paperValue);
-        updateHandPower(player, Hand.Scissors, scissorsValue);
+        setBaseHandPower(player, Hand.Rock, rockValue);
+        setBaseHandPower(player, Hand.Paper, paperValue);
+        setBaseHandPower(player, Hand.Scissors, scissorsValue);
     }
 
     private void gameLogDisplay(String labelText)
@@ -204,14 +209,16 @@ public partial class fight : Control
         public String VBoxPath;
         public int maxHealth;
         public int currentHealth;
-        public int[] handValues;
+        //these are white (unconditional) hand values
+        public int[] baseHandValues;
+        public int[] upgradeThresholds;
         public PowerUp[] powerUps;
         public Hand thrownHand;
         public bool hasThrown;
         public Player(String path)
         {
             VBoxPath = path;
-            handValues = new int[3];
+            baseHandValues = new int[3];
             hasThrown = false;
         }
 
@@ -226,9 +233,13 @@ public partial class fight : Control
         }
     }
 
+    // stores a single round of "combat". a list of these is one game
     public class RoundResult
     {
+        //in the future if necessary, we can calculate and store wins/ties instead of just hand history
         public Hand[] playerHands;
+        //we're saving damage for the UI even if it's not used for mechanics
+        // this is an array because each player can take different amounts of damage in one round
         public int[] damage;
     }
     public class PowerUp
