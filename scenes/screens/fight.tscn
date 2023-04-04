@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://dnjrt0lngoro"]
+[gd_scene load_steps=14 format=3 uid="uid://dnjrt0lngoro"]
 
 [ext_resource type="Texture2D" uid="uid://bep1015jkmd0" path="res://assets/player sprites/cat.png" id="1_6l72s"]
 [ext_resource type="Script" path="res://scenes/screens/fight.cs" id="1_8ieqv"]
@@ -6,6 +6,7 @@
 [ext_resource type="StyleBox" uid="uid://cd0iwwr6mbmwu" path="res://bluestyleboxflat.tres" id="3_fr701"]
 [ext_resource type="StyleBox" uid="uid://bfel3b86n2psb" path="res://scenes/screens/greenstyleboxflat.tres" id="4_it4ea"]
 [ext_resource type="Theme" uid="uid://bumnwnco8nxol" path="res://theme.tres" id="4_rvgd2"]
+[ext_resource type="Script" path="res://scenes/screens/TextBox.cs" id="6_ldefa"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scxvc"]
 bg_color = Color(0, 0, 0, 0.513726)
@@ -67,6 +68,7 @@ grow_vertical = 2
 [node name="PlayerVBox0" type="VBoxContainer" parent="LocalHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 0
 alignment = 1
 
 [node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox0"]
@@ -167,6 +169,7 @@ text = "Scissors: 1"
 [node name="PlayerVBox1" type="VBoxContainer" parent="LocalHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 0
 alignment = 1
 
 [node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox1"]
@@ -263,17 +266,23 @@ theme_override_constants/outline_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_3dyfl")
 text = "Scissors: 1"
 
-[node name="GameLog" type="Panel" parent="."]
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+script = ExtResource("6_ldefa")
 
-[node name="Label" type="Label" parent="GameLog"]
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="GameLog" type="Panel" parent="CanvasLayer/MarginContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/MarginContainer/GameLog"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

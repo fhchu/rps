@@ -88,7 +88,7 @@ public partial class fight : Control
             // player does not handle setting of their own powers
             setAllHands(player, 1, 1, 1);
             // perhaps we can have different upgrade thresholds per player? 
-            player.upgradeThresholds = new int[] {3, 10};
+            player.upgradeThresholds = new int[] { 3, 10 };
         }
     }
 
@@ -212,7 +212,7 @@ public partial class fight : Control
         //these are white (unconditional) hand values
         public int[] baseHandValues;
         public int[] upgradeThresholds;
-        public PowerUp[] powerUps;
+        public List<PowerUp> powerUps;
         public Hand thrownHand;
         public bool hasThrown;
         public Player(String path)
@@ -220,6 +220,7 @@ public partial class fight : Control
             VBoxPath = path;
             baseHandValues = new int[3];
             hasThrown = false;
+            powerUps = new List<PowerUp>();
         }
 
         public void calculateHandValues()
