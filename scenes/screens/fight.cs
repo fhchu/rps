@@ -6,6 +6,9 @@ public partial class fight : Control
 {
     //Allows us to access and update UI elements from this file
     const String PLAYER_NODE_PATH = "LocalHBox/PlayerVBox";
+    const String GAMELOG_PATH = "CanvasLayer/TextboxMargin/GameLog";
+    const String UPGRADES_PATH = "CanvasLayer/UpgradesHbox/GameLog";
+
     const String HANDS_UI_PATH = "/AttacksPanel/HandsHBox";
     const int NUM_PLAYERS = 2;
     public enum Hand { Rock, Paper, Scissors }
@@ -16,14 +19,15 @@ public partial class fight : Control
     private int[] phaseHealth = { 20 };
     private int totalPhases = 1;
     private int currentPhase;
-    private bool combatIsOn;
+    private bool isCombatEnabled;
+    private bool isUpgradePhase;
 
     Panel gameLog;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        gameLog = (Panel)GetNode("GameLog");
+        gameLog = (Panel)GetNode(GAMELOG_PATH);
         gameLog.Hide();
 
         // we might want to have multiple phases one day
@@ -36,7 +40,7 @@ public partial class fight : Control
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
-        if (combatIsOn)
+        if (isCombatEnabled)
         {
             if (Input.IsActionJustPressed("rock0"))
             {
@@ -73,6 +77,9 @@ public partial class fight : Control
                 throwHands();
             }
         }
+        else if (isUpgradePhase){
+
+        }
     }
 
     // build players before game starts.
@@ -88,7 +95,10 @@ public partial class fight : Control
             // player does not handle setting of their own powers
             setAllHands(player, 1, 1, 1);
             // perhaps we can have different upgrade thresholds per player? 
-            player.upgradeThresholds = new int[] { 3, 10 };
+            //player thresholds must be added in ascending order and cannot be higher than maxHealth (or we're buggin out!!)
+            player.upgradeThresholds.Add(3);
+            player.upgradeThresholds.Add(10);
+
         }
     }
 
@@ -111,7 +121,7 @@ public partial class fight : Control
 
     private void waitForHands()
     {
-        combatIsOn = true;
+        isCombatEnabled = true;
     }
     private void throwHands()
     {
@@ -147,6 +157,11 @@ public partial class fight : Control
         loser.calculateHandValues();
     }
 
+    private void selectUpgrade(Player player, int selection){
+        isCombatEnabled = false;
+        isUpgradePhase = true;
+        player.powerUpsObtained.Add(powerUps)
+    }
     private void endPhase(Player loser)
     {
         if (currentPhase == totalPhases)
@@ -155,13 +170,13 @@ public partial class fight : Control
             gameLogDisplay("Game Over!");
             TextureRect loserPic = (TextureRect)GetNode(loser.VBoxPath).GetNode("TextureRect");
             loserPic.FlipV = true;
-            combatIsOn = false;
+            isCombatEnabled = false;
         }
     }
 
 
     //presumably the player knows their own max health. we are simply setting the health to this value.
-    // returns 
+    // returns true or false based on ?? TODO
     private bool updateHealth(Player player, int health)
     {
         String healthBarControl = player.VBoxPath + "/HealthBar";
@@ -174,6 +189,10 @@ public partial class fight : Control
         if (player.currentHealth <= 0)
         {
             endPhase(player);
+        }
+        else if (player.upgradeThresholds.Count > 0 && player.currentHealth <= player.maxHealth - player.upgradeThresholds[0]){
+            isUpgradePhase = true;
+            isCombatEnabled = false;
         }
 
         return false;
@@ -211,8 +230,9 @@ public partial class fight : Control
         public int currentHealth;
         //these are white (unconditional) hand values
         public int[] baseHandValues;
-        public int[] upgradeThresholds;
-        public List<PowerUp> powerUps;
+        public PowerUp[] powerUpLibrary;
+        public List<int> upgradeThresholds;
+        public List<PowerUp> powerUpsObtained;
         public Hand thrownHand;
         public bool hasThrown;
         public Player(String path)
@@ -220,17 +240,17 @@ public partial class fight : Control
             VBoxPath = path;
             baseHandValues = new int[3];
             hasThrown = false;
-            powerUps = new List<PowerUp>();
+            upgradeThresholds = new List<int>();
+            powerUpsObtained = new List<PowerUp>();
         }
 
         public void calculateHandValues()
         {
             int[] handModifiers = new int[3];
-            foreach (PowerUp power in powerUps)
+            foreach (PowerUp power in powerUpsObtained)
             {
                 power.calculateDamage();
             }
-
         }
     }
 
@@ -245,6 +265,8 @@ public partial class fight : Control
     }
     public class PowerUp
     {
+        public String title;
+        public String description;
         public int[] calculateDamage()
         {
             return new int[3];

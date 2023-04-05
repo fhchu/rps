@@ -3,6 +3,7 @@ using System;
 
 public partial class TextBox : CanvasLayer
 {
+	const String gamelog = "CanvasLayer/MarginContainer/GameLog";
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
