@@ -272,7 +272,7 @@ text = "Scissors: 1"
 script = ExtResource("6_ldefa")
 
 [node name="TextboxMargin" type="MarginContainer" parent="CanvasLayer"]
-anchors_preset = -1
+anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -335,14 +335,14 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UpgradesHBox"]
+[node name="MarginContainer0" type="MarginContainer" parent="CanvasLayer/UpgradesHBox"]
 layout_mode = 2
 
-[node name="Panel" type="Panel" parent="CanvasLayer/UpgradesHBox/MarginContainer"]
+[node name="Panel" type="Panel" parent="CanvasLayer/UpgradesHBox/MarginContainer0"]
 custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UpgradesHBox/MarginContainer/Panel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UpgradesHBox/MarginContainer0/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -351,14 +351,44 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="Title" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer/Panel/VBoxContainer"]
+[node name="Title" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer0/Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Title"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer/Panel/VBoxContainer"]
+[node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer0/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "description"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer1" type="MarginContainer" parent="CanvasLayer/UpgradesHBox"]
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="CanvasLayer/UpgradesHBox/MarginContainer1"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UpgradesHBox/MarginContainer1/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer1/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Title"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer1/Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "description"
@@ -389,36 +419,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer2/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "description"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="MarginContainer3" type="MarginContainer" parent="CanvasLayer/UpgradesHBox"]
-layout_mode = 2
-
-[node name="Panel" type="Panel" parent="CanvasLayer/UpgradesHBox/MarginContainer3"]
-custom_minimum_size = Vector2(350, 0)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UpgradesHBox/MarginContainer3/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="Title" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer3/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "Title"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer3/Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "description"
