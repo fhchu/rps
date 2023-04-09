@@ -11,10 +11,12 @@ public partial class fight : Control
 
     const String HANDS_UI_PATH = "/AttacksPanel/HandsHBox";
     const int NUM_PLAYERS = 2;
-    public enum Hand { Rock, Paper, Scissors }
+    const int NUM_HANDS = 3;
+    public enum Hand { ROCK, PAPER, SCISSORS }
+    public enum Operation { ADD, MULTIPLY, DIVIDE }
 
     private Player[] players;
-    private List<RoundResult> roundResults;
+    private static List<RoundResult> roundResults;
     // this is an array because we might want more phases in the future
     private int[] phaseHealth = { 20 };
     private int totalPhases = 1;
@@ -45,32 +47,32 @@ public partial class fight : Control
         {
             if (Input.IsActionJustPressed("rock0"))
             {
-                players[0].thrownHand = Hand.Rock;
+                players[0].thrownHand = Hand.ROCK;
                 players[0].hasThrown = true;
             }
             if (Input.IsActionJustPressed("paper0"))
             {
-                players[0].thrownHand = Hand.Paper;
+                players[0].thrownHand = Hand.PAPER;
                 players[0].hasThrown = true;
             }
             if (Input.IsActionJustPressed("scissors0"))
             {
-                players[0].thrownHand = Hand.Scissors;
+                players[0].thrownHand = Hand.SCISSORS;
                 players[0].hasThrown = true;
             }
             if (Input.IsActionJustPressed("rock1"))
             {
-                players[1].thrownHand = Hand.Rock;
+                players[1].thrownHand = Hand.ROCK;
                 players[1].hasThrown = true;
             }
             if (Input.IsActionJustPressed("paper1"))
             {
-                players[1].thrownHand = Hand.Paper;
+                players[1].thrownHand = Hand.PAPER;
                 players[1].hasThrown = true;
             }
             if (Input.IsActionJustPressed("scissors1"))
             {
-                players[1].thrownHand = Hand.Scissors;
+                players[1].thrownHand = Hand.SCISSORS;
                 players[1].hasThrown = true;
             }
             if (players[1].hasThrown && players[0].hasThrown)
@@ -130,7 +132,8 @@ public partial class fight : Control
             //player thresholds must be added in ascending order and cannot be higher than maxHealth (or we're buggin out!!)
             player.upgradeThresholds.Add(3);
             player.upgradeThresholds.Add(10);
-
+            //TODO remove this, just testing
+            player.powerUpsObtained.Add(new BigRock(player));
         }
     }
 
@@ -147,47 +150,70 @@ public partial class fight : Control
             ProgressBar healthBar = (ProgressBar)GetNode(healthBarControl);
             healthBar.MaxValue = phaseHealth;
             updateHealth(player, phaseHealth);
+            updateDamageUI(player);
         }
-        waitForHands();
-    }
-
-    private void waitForHands()
-    {
         isCombatEnabled = true;
     }
+
+    //calculate damage and update UI text and color with those values
+    private void updateDamageUI(Player player)
+    {
+        player.calculateHandValues();
+
+        Button handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + "Rock" + "Button");
+        handButton.Text = "Rock" + ": " + player.realHandValues[0];
+        handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + "Paper" + "Button");
+        handButton.Text = "Paper" + ": " + player.realHandValues[1];
+        handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + "Scissors" + "Button");
+        handButton.Text = "Scissors" + ": " + player.realHandValues[2];
+        //TODO make this green or red if it's bigger/smaller
+        //if (value = player.baseHandValues)
+
+    }
+
+    //calculate winner and apply damage
     private void throwHands()
     {
         Player player0 = players[0];
         Player player1 = players[1];
         player0.hasThrown = false;
         player1.hasThrown = false;
-        Player winner;
-        Player loser;
+        int winner = -1;
+        Player winnerPlayer;
+        Player loserPlayer;
+        int[] damageArray = new int[2];
         //tie case
         if (player0.thrownHand == player1.thrownHand)
         {
-            return;
-        }
-        else if ((player0.thrownHand == Hand.Rock && player1.thrownHand == Hand.Scissors) ||
-            (player0.thrownHand == Hand.Paper && player1.thrownHand == Hand.Rock) ||
-            (player0.thrownHand == Hand.Scissors && player1.thrownHand == Hand.Paper))
-        {
-            winner = player0;
-            loser = player1;
-        }
+            player
+            if (player0.powerUpsObtained.ContainsKey(BigRock.title) && player0.powerUpsObtained.){
 
+            }
+        }
+        else if ((player0.thrownHand == Hand.ROCK && player1.thrownHand == Hand.SCISSORS) ||
+            (player0.thrownHand == Hand.PAPER && player1.thrownHand == Hand.ROCK) ||
+            (player0.thrownHand == Hand.SCISSORS && player1.thrownHand == Hand.PAPER))
+        {
+            winner = 0;
+            winnerPlayer = player0;
+            loserPlayer = player1;
+        }
         else
         {
-            winner = player1;
-            loser = player0;
+            winner = 1;
+            winnerPlayer = player1;
+            loserPlayer = player0;
         }
-        if (updateHealth(loser, loser.currentHealth - winner.baseHandValues[(int)winner.thrownHand]))
-        {
+        if(winner != -1){
+            int damage = winnerPlayer.realHandValues[(int)winnerPlayer.thrownHand];
+            //1-x will flip 1 and 0
+            damageArray[1-winner] = damage;
+            updateHealth(loserPlayer, loserPlayer.currentHealth - damage);
+        }
 
-        }
-        roundResults.Add(new RoundResult());
-        winner.calculateHandValues();
-        loser.calculateHandValues();
+        roundResults.Add(new RoundResult(new Hand[] { player0.thrownHand, player1.thrownHand }, damageArray, winner));
+        updateDamageUI(player0);
+        updateDamageUI(player1);
     }
 
     private void selectUpgrade(Player player, int selection)
@@ -211,7 +237,7 @@ public partial class fight : Control
         }
     }
 
-    //presumably the player knows their own max health. we are simply setting the health to this value.
+    // the player knows their own max health. we are simply setting the health to this value.
     // returns true or false based on ?? TODO
     private bool updateHealth(Player player, int health)
     {
@@ -241,7 +267,7 @@ public partial class fight : Control
         isCombatEnabled = false;
         upgradingPlayer = player.playerId;
         Control upgrades = (Control)GetNode(UPGRADES_PATH);
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < NUM_HANDS; i++)
         {
             Control marginContainer = (Control)upgrades.GetNode("MarginContainer" + i + "/Panel/VBoxContainer");
 
@@ -249,21 +275,22 @@ public partial class fight : Control
         upgrades.Show();
     }
 
-    //updates the player's hand power in backend and UI
+    //updates the player's hand power in backend 
+    // TODO delete ?? and UI
     private void setBaseHandPower(Player player, Hand hand, int value)
     {
-        String handName = hand.ToString();
         player.baseHandValues[(int)hand] = value;
-        Button handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + handName + "Button");
-        handButton.Text = handName + ": " + value;
+        //String handName = hand.ToString();
+        //Button handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + handName + "Button");
+        //handButton.Text = handName + ": " + value;
     }
 
     //update all 3 hands at once
     private void setAllHands(Player player, int rockValue, int paperValue, int scissorsValue)
     {
-        setBaseHandPower(player, Hand.Rock, rockValue);
-        setBaseHandPower(player, Hand.Paper, paperValue);
-        setBaseHandPower(player, Hand.Scissors, scissorsValue);
+        setBaseHandPower(player, Hand.ROCK, rockValue);
+        setBaseHandPower(player, Hand.PAPER, paperValue);
+        setBaseHandPower(player, Hand.SCISSORS, scissorsValue);
     }
 
     private void gameLogDisplay(String labelText)
@@ -282,27 +309,37 @@ public partial class fight : Control
         //these are white (unconditional) hand values
         // rock = 0, paper = 1, scissors = 2
         public int[] baseHandValues;
+        public int[] realHandValues;
         public PowerUp[] powerUpLibrary;
         public List<int> upgradeThresholds;
-        public List<PowerUp> powerUpsObtained;
+        public Dictionary<String, PowerUp> powerUpsObtained;
         public Hand thrownHand;
         public bool hasThrown;
         public Player(String path, int id)
         {
             playerId = id;
             VBoxPath = path;
-            baseHandValues = new int[3];
+            baseHandValues = new int[NUM_HANDS];
+            realHandValues = new int[NUM_HANDS];
             hasThrown = false;
             upgradeThresholds = new List<int>();
-            powerUpsObtained = new List<PowerUp>();
+            powerUpsObtained = new Dictionary<string, PowerUp>();
         }
 
         public void calculateHandValues()
         {
-            int[] handModifiers = new int[3];
-            foreach (PowerUp power in powerUpsObtained)
+            List<Multiplier> addSubList = new List<Multiplier>();
+            //TODO if necessary
+            // List<Multiplier> multDivList = new List<Multiplier>;
+
+            foreach (KeyValuePair<String, PowerUp> power in powerUpsObtained)
             {
-                power.calculateDamage();
+                addSubList.AddRange(power.Value.calculateDamage());
+            }
+            Array.Copy(baseHandValues, realHandValues, baseHandValues.Length);
+            foreach (Multiplier multiplier in addSubList)
+            {
+                realHandValues[(int)multiplier.hand] += multiplier.value;
             }
         }
     }
@@ -310,33 +347,73 @@ public partial class fight : Control
     // stores a single round of "combat". a list of these is one game
     public class RoundResult
     {
-        //in the future if necessary, we can calculate and store wins/ties instead of just hand history
         public Hand[] playerHands;
         //we're saving damage for the UI even if it's not used for mechanics
         // this is an array because each player can take different amounts of damage in one round
-        public int[] damage;
-
-        RoundResult(Hand player0Hand, Hand player1Hand, )
+        public int[] damages;
+        //0 for player1, 1 for player2, -1 for tie
+        public int winner;
+        public RoundResult(Hand[] playerHands, int[] damages, int winner)
+        {
+            this.playerHands = playerHands;
+            this.damages = damages;
+            this.winner = winner;
+        }
     }
 
     public abstract class PowerUp
     {
-        public String title;
-        public String description;
-        public abstract int[] calculateDamage(Player player);
+        public static String title;
+        public static String description;
+        //tells the backend/UI whether to list this powerup as active
+        public abstract bool isActive();
+        //
+        public abstract List<Multiplier> calculateDamage();
+    }
+
+    // contains an operation and a value for damage calculation.
+    // examples Addition, 2, Paper = +2 Paper damage
+    public class Multiplier
+    {
+        public Operation operation;
+        public int value;
+        public Hand hand;
+
+        Multiplier(Operation operation, int value, Hand hand)
+        {
+            this.operation = operation;
+            this.value = value;
+            this.hand = hand;
+        }
     }
 
     public class BigRock : PowerUp
     {
-        BigRock()
+        String title = "Big Rock";
+        int ownerId;
+        public BigRock(Player player)
         {
             title = "Big Rock";
-            description = "Every third Rock you throw breaks ties";
+            description = "Your third Rock thrown in a row breaks ties";
+            ownerId = player.playerId;
         }
-        public override int[] calculateDamage(Player player)
-        {
-            if ()
 
+        public override bool isActive()
+        {
+            int numRounds = roundResults.Count;
+            if (numRounds >= 2)
+            {
+                if (roundResults[numRounds - 1].playerHands[ownerId] == Hand.ROCK &&
+                roundResults[numRounds - 2].playerHands[ownerId] == Hand.ROCK)
+                    GD.Print("BigRockActive for player " + ownerId);
+                return true;
+            }
+            return false;
+        }
+        // this powerup does not affect damage and needs to be hardcoded
+        public override List<Multiplier> calculateDamage()
+        {
+            return new List<Multiplier>();
         }
     }
 }
