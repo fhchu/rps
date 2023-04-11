@@ -158,10 +158,15 @@ public partial class fight : Control
     //calculate damage and update UI text and color with those values
     private void updateDamageUI(Player player)
     {
+        string bigRock = "";
+        if (player.powerUpsObtained[BigRock.Name].isActive())
+        {
+            bigRock = "Big ";
+        }
         player.calculateHandValues();
 
         Button handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + "Rock" + "Button");
-        handButton.Text = "Rock" + ": " + player.realHandValues[0];
+        handButton.Text = bigRock + "Rock" + ": " + player.realHandValues[0];
         handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + "Paper" + "Button");
         handButton.Text = "Paper" + ": " + player.realHandValues[1];
         handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + "Scissors" + "Button");
@@ -197,6 +202,7 @@ public partial class fight : Control
                 }
                 else if (BRActive1 && !BRActive0)
                 {
+                    winner = 1;
                     winnerPlayer = player1;
                     loserPlayer = player0;
                 }
@@ -223,6 +229,7 @@ public partial class fight : Control
         }
 
         roundResults.Add(new RoundResult(new Hand[] { player0.thrownHand, player1.thrownHand }, damageArray, winner));
+
         updateDamageUI(player0);
         updateDamageUI(player1);
     }
@@ -415,12 +422,12 @@ public partial class fight : Control
             {
                 int i = numRounds - 1;
                 int rocks = 0;
-                while (roundResults[i].playerHands[ownerId] == Hand.ROCK)
+                while (i >= 0 && roundResults[i].playerHands[ownerId] == Hand.ROCK)
                 {
                     i--;
                     rocks++;
                 }
-                if (rocks + 1 % 3 == 0)
+                if ((rocks + 1) % 3 == 0)
                 {
                     GD.Print("BigRockActive for player " + ownerId);
                     return true;
