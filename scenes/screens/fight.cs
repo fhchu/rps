@@ -5,11 +5,11 @@ using System.Collections.Generic;
 public partial class fight : Control
 {
     //Allows us to access and update UI elements from this file
-    const String PLAYER_NODE_PATH = "LocalHBox/PlayerVBox";
-    const String GAMELOG_PATH = "CanvasLayer/TextboxMargin/GameLog";
-    const String UPGRADES_PATH = "CanvasLayer/UpgradesHBox";
+    const string PLAYER_NODE_PATH = "LocalHBox/PlayerVBox";
+    const string GAMELOG_PATH = "CanvasLayer/TextboxMargin/GameLog";
+    const string UPGRADES_PATH = "CanvasLayer/UpgradesHBox";
 
-    const String HANDS_UI_PATH = "/AttacksPanel/HandsHBox";
+    const string HANDS_UI_PATH = "/AttacksPanel/HandsHBox";
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
     public enum Hand { ROCK, PAPER, SCISSORS }
@@ -133,7 +133,7 @@ public partial class fight : Control
             player.upgradeThresholds.Add(3);
             player.upgradeThresholds.Add(10);
             //TODO remove this, just testing
-            player.powerUpsObtained.Add(new BigRock(player));
+            player.powerUpsObtained[BigRock.Name] = new BigRock(player);
         }
     }
 
@@ -146,7 +146,7 @@ public partial class fight : Control
             Player player = players[i];
             player.maxHealth = phaseHealth;
 
-            String healthBarControl = player.VBoxPath + "/HealthBar";
+            string healthBarControl = player.VBoxPath + "/HealthBar";
             ProgressBar healthBar = (ProgressBar)GetNode(healthBarControl);
             healthBar.MaxValue = phaseHealth;
             updateHealth(player, phaseHealth);
@@ -179,15 +179,27 @@ public partial class fight : Control
         player0.hasThrown = false;
         player1.hasThrown = false;
         int winner = -1;
-        Player winnerPlayer;
-        Player loserPlayer;
+        Player winnerPlayer = player0;
+        Player loserPlayer = player1;
         int[] damageArray = new int[2];
         //tie case
         if (player0.thrownHand == player1.thrownHand)
         {
-            player
-            if (player0.powerUpsObtained.ContainsKey(BigRock.title) && player0.powerUpsObtained.){
+            //hardcoding bigRock tieBreaks
+            if (player0.thrownHand == Hand.ROCK)
+            {
+                bool BRActive0 = player0.powerUpsObtained.ContainsKey(BigRock.Name) ? player0.powerUpsObtained[BigRock.Name].isActive() : false;
+                bool BRActive1 = player1.powerUpsObtained.ContainsKey(BigRock.Name) ? player1.powerUpsObtained[BigRock.Name].isActive() : false;
 
+                if (BRActive0 && !BRActive1)
+                {
+                    winner = 0;
+                }
+                else if (BRActive1 && !BRActive0)
+                {
+                    winnerPlayer = player1;
+                    loserPlayer = player0;
+                }
             }
         }
         else if ((player0.thrownHand == Hand.ROCK && player1.thrownHand == Hand.SCISSORS) ||
@@ -195,8 +207,6 @@ public partial class fight : Control
             (player0.thrownHand == Hand.SCISSORS && player1.thrownHand == Hand.PAPER))
         {
             winner = 0;
-            winnerPlayer = player0;
-            loserPlayer = player1;
         }
         else
         {
@@ -204,10 +214,11 @@ public partial class fight : Control
             winnerPlayer = player1;
             loserPlayer = player0;
         }
-        if(winner != -1){
+        if (winner != -1)
+        {
             int damage = winnerPlayer.realHandValues[(int)winnerPlayer.thrownHand];
             //1-x will flip 1 and 0
-            damageArray[1-winner] = damage;
+            damageArray[1 - winner] = damage;
             updateHealth(loserPlayer, loserPlayer.currentHealth - damage);
         }
 
@@ -241,7 +252,7 @@ public partial class fight : Control
     // returns true or false based on ?? TODO
     private bool updateHealth(Player player, int health)
     {
-        String healthBarControl = player.VBoxPath + "/HealthBar";
+        string healthBarControl = player.VBoxPath + "/HealthBar";
         ProgressBar healthBar = (ProgressBar)GetNode(healthBarControl);
         player.currentHealth = health;
         healthBar.Value = health;
@@ -280,7 +291,7 @@ public partial class fight : Control
     private void setBaseHandPower(Player player, Hand hand, int value)
     {
         player.baseHandValues[(int)hand] = value;
-        //String handName = hand.ToString();
+        //string handName = hand.ToString();
         //Button handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + handName + "Button");
         //handButton.Text = handName + ": " + value;
     }
@@ -293,7 +304,7 @@ public partial class fight : Control
         setBaseHandPower(player, Hand.SCISSORS, scissorsValue);
     }
 
-    private void gameLogDisplay(String labelText)
+    private void gameLogDisplay(string labelText)
     {
         gameLog.Show();
         Label gameLogLabel = (Label)gameLog.GetNode("Label");
@@ -303,7 +314,7 @@ public partial class fight : Control
     public class Player
     {
         public int playerId;
-        public String VBoxPath;
+        public string VBoxPath;
         public int maxHealth;
         public int currentHealth;
         //these are white (unconditional) hand values
@@ -312,10 +323,10 @@ public partial class fight : Control
         public int[] realHandValues;
         public PowerUp[] powerUpLibrary;
         public List<int> upgradeThresholds;
-        public Dictionary<String, PowerUp> powerUpsObtained;
+        public Dictionary<string, PowerUp> powerUpsObtained;
         public Hand thrownHand;
         public bool hasThrown;
-        public Player(String path, int id)
+        public Player(string path, int id)
         {
             playerId = id;
             VBoxPath = path;
@@ -363,8 +374,7 @@ public partial class fight : Control
 
     public abstract class PowerUp
     {
-        public static String title;
-        public static String description;
+
         //tells the backend/UI whether to list this powerup as active
         public abstract bool isActive();
         //
@@ -389,12 +399,12 @@ public partial class fight : Control
 
     public class BigRock : PowerUp
     {
-        String title = "Big Rock";
+        public static string Name { get { return "Big Rock"; } }
+        public static string Description { get { return "Your third Rock thrown in a row breaks ties"; } }
+
         int ownerId;
         public BigRock(Player player)
         {
-            title = "Big Rock";
-            description = "Your third Rock thrown in a row breaks ties";
             ownerId = player.playerId;
         }
 
@@ -403,10 +413,18 @@ public partial class fight : Control
             int numRounds = roundResults.Count;
             if (numRounds >= 2)
             {
-                if (roundResults[numRounds - 1].playerHands[ownerId] == Hand.ROCK &&
-                roundResults[numRounds - 2].playerHands[ownerId] == Hand.ROCK)
+                int i = numRounds - 1;
+                int rocks = 0;
+                while (roundResults[i].playerHands[ownerId] == Hand.ROCK)
+                {
+                    i--;
+                    rocks++;
+                }
+                if (rocks + 1 % 3 == 0)
+                {
                     GD.Print("BigRockActive for player " + ownerId);
-                return true;
+                    return true;
+                }
             }
             return false;
         }
