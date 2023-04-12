@@ -87,13 +87,16 @@ public partial class fight : Control
                 if (Input.IsActionJustPressed("rock0"))
                 {
                     GD.Print("1");
+                    selectUpgrade(players[0], 0);
                 }
                 if (Input.IsActionJustPressed("paper0"))
                 {
+                    selectUpgrade(players[0], 1);
                     GD.Print("2");
                 }
                 if (Input.IsActionJustPressed("scissors0"))
                 {
+                    selectUpgrade(players[0], 2);
                     GD.Print("3");
                 }
             }
@@ -101,14 +104,17 @@ public partial class fight : Control
             {
                 if (Input.IsActionJustPressed("rock1"))
                 {
+                    selectUpgrade(players[1], 0);
                     GD.Print("1");
                 }
                 if (Input.IsActionJustPressed("paper1"))
                 {
+                    selectUpgrade(players[1], 1);
                     GD.Print("2");
                 }
                 if (Input.IsActionJustPressed("scissors1"))
                 {
+                    selectUpgrade(players[1], 2);
                     GD.Print("3");
                 }
             }
@@ -288,6 +294,12 @@ public partial class fight : Control
         for (int i = 0; i < NUM_HANDS; i++)
         {
             Control marginContainer = (Control)upgrades.GetNode("MarginContainer" + i + "/Panel/VBoxContainer");
+            Label titleLabel = (Label)marginContainer.GetNode("Title");
+            Label descriptionLabel = (Label)marginContainer.GetNode("Description");
+            PowerUp powerUp = player.powerUpLibrary[i];
+            GD.Print(powerUp.GetType().ToString());
+            titleLabel.Text = powerUp.GetType().Name;
+            descriptionLabel.Text = powerUp.Description;
 
         }
         upgrades.Show();
@@ -328,7 +340,7 @@ public partial class fight : Control
         // rock = 0, paper = 1, scissors = 2
         public int[] baseHandValues;
         public int[] realHandValues;
-        public PowerUp[] powerUpLibrary;
+        public List<PowerUp> powerUpLibrary;
         public List<int> upgradeThresholds;
         public Dictionary<string, PowerUp> powerUpsObtained;
         public Hand thrownHand;
@@ -341,6 +353,10 @@ public partial class fight : Control
             realHandValues = new int[NUM_HANDS];
             hasThrown = false;
             upgradeThresholds = new List<int>();
+            powerUpLibrary = new List<PowerUp>();
+            powerUpLibrary.Add(new BigRock(this));
+            powerUpLibrary.Add(new MindChange(this));
+            powerUpLibrary.Add(new InARow(this));
             powerUpsObtained = new Dictionary<string, PowerUp>();
         }
 
@@ -379,15 +395,6 @@ public partial class fight : Control
         }
     }
 
-    public abstract class PowerUp
-    {
-
-        //tells the backend/UI whether to list this powerup as active
-        public abstract bool isActive();
-        //
-        public abstract List<Multiplier> calculateDamage();
-    }
-
     // contains an operation and a value for damage calculation.
     // examples Addition, 2, Paper = +2 Paper damage
     public class Multiplier
@@ -396,7 +403,7 @@ public partial class fight : Control
         public int value;
         public Hand hand;
 
-        Multiplier(Operation operation, int value, Hand hand)
+        public Multiplier(Operation operation, int value, Hand hand)
         {
             this.operation = operation;
             this.value = value;
@@ -404,10 +411,21 @@ public partial class fight : Control
         }
     }
 
+    public abstract class PowerUp
+    {
+
+        public string Name { get { return "uh oh!"; } }
+        public string Description { get { return "you shouldn't be seeing this!"; } }
+        //tells the backend/UI whether to list this powerup as active
+        public abstract bool isActive();
+        //
+        public abstract List<Multiplier> calculateDamage();
+    }
+
     public class BigRock : PowerUp
     {
-        public static string Name { get { return "Big Rock"; } }
-        public static string Description { get { return "Your third Rock thrown in a row breaks ties"; } }
+        public static new string Name { get { return "Big Rock"; } }
+        public static new string Description { get { return "Your third Rock thrown in a row breaks ties"; } }
 
         int ownerId;
         public BigRock(Player player)
@@ -439,6 +457,69 @@ public partial class fight : Control
         public override List<Multiplier> calculateDamage()
         {
             return new List<Multiplier>();
+        }
+    }
+
+    public class InARow : PowerUp
+    {
+        public static new string Name { get { return "Streak Bonus"; } }
+        public static new string Description { get { return "Every hand you throw in a row is worth +1 more"; } }
+        int ownerId;
+        public InARow(Player player)
+        {
+            ownerId = player.playerId;
+        }
+        public override bool isActive()
+        {
+            return true;
+        }
+        public override List<Multiplier> calculateDamage()
+        {
+            List<Multiplier> multipliers = new List<Multiplier>();
+            if (roundResults.Count >= 1)
+            {
+                int count = 1;
+                int i = roundResults.Count - 1;
+                Hand lastHand = roundResults[i].playerHands[ownerId];
+                i--;
+                while (i >= 0 && roundResults[i].playerHands[ownerId] == lastHand)
+                {
+                    count++;
+                }
+                multipliers.Add(new Multiplier(Operation.ADD, count, lastHand));
+            }
+            return multipliers;
+        }
+    }
+
+    public class MindChange : PowerUp
+    {
+        public static new string Name { get { return "Noncomittal"; } }
+        public static new string Description { get { return "+1 if you throw a different hand than before"; } }
+        int ownerId;
+        public MindChange(Player player)
+        {
+            ownerId = player.playerId;
+        }
+        public override bool isActive()
+        {
+            return true;
+        }
+        public override List<Multiplier> calculateDamage()
+        {
+            List<Multiplier> multipliers = new List<Multiplier>();
+            if (roundResults.Count >= 1)
+            {
+                int i = roundResults.Count - 1;
+                List<Hand> handList = new List<Hand> { Hand.ROCK, Hand.PAPER, Hand.SCISSORS };
+                Hand lastHand = roundResults[i].playerHands[ownerId];
+                handList.Remove(lastHand);
+                foreach (Hand hand in handList)
+                {
+                    multipliers.Add(new Multiplier(Operation.ADD, 1, hand));
+                }
+            }
+            return multipliers;
         }
     }
 }
