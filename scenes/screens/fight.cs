@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public partial class fight : Control
 {
+    const string BIGROCK_NAME = "Big Rock";
     //Allows us to access and update UI elements from this file
     const string PLAYER_NODE_PATH = "LocalHBox/PlayerVBox";
     const string GAMELOG_PATH = "CanvasLayer/TextboxMargin/GameLog";
@@ -139,7 +140,7 @@ public partial class fight : Control
             player.upgradeThresholds.Add(3);
             player.upgradeThresholds.Add(10);
             //TODO remove this, just testing
-            player.powerUpsObtained[BigRock.Name] = new BigRock(player);
+            player.powerUpsObtained[BIGROCK_NAME] = new BigRock(player);
         }
     }
 
@@ -165,7 +166,7 @@ public partial class fight : Control
     private void updateDamageUI(Player player)
     {
         string bigRock = "";
-        if (player.powerUpsObtained[BigRock.Name].isActive())
+        if (player.powerUpsObtained[BIGROCK_NAME].isActive())
         {
             bigRock = "Big ";
         }
@@ -199,8 +200,8 @@ public partial class fight : Control
             //hardcoding bigRock tieBreaks
             if (player0.thrownHand == Hand.ROCK)
             {
-                bool BRActive0 = player0.powerUpsObtained.ContainsKey(BigRock.Name) ? player0.powerUpsObtained[BigRock.Name].isActive() : false;
-                bool BRActive1 = player1.powerUpsObtained.ContainsKey(BigRock.Name) ? player1.powerUpsObtained[BigRock.Name].isActive() : false;
+                bool BRActive0 = player0.powerUpsObtained.ContainsKey(BIGROCK_NAME) ? player0.powerUpsObtained[BIGROCK_NAME].isActive() : false;
+                bool BRActive1 = player1.powerUpsObtained.ContainsKey(BIGROCK_NAME) ? player1.powerUpsObtained[BIGROCK_NAME].isActive() : false;
 
                 if (BRActive0 && !BRActive1)
                 {
@@ -298,7 +299,7 @@ public partial class fight : Control
             Label descriptionLabel = (Label)marginContainer.GetNode("Description");
             PowerUp powerUp = player.powerUpLibrary[i];
             GD.Print(powerUp.GetType().ToString());
-            titleLabel.Text = powerUp.GetType().Name;
+            titleLabel.Text = powerUp.Name;
             descriptionLabel.Text = powerUp.Description;
 
         }
@@ -414,8 +415,8 @@ public partial class fight : Control
     public abstract class PowerUp
     {
 
-        public string Name { get { return "uh oh!"; } }
-        public string Description { get { return "you shouldn't be seeing this!"; } }
+        public abstract string Name { get; }
+        public abstract string Description { get; }
         //tells the backend/UI whether to list this powerup as active
         public abstract bool isActive();
         //
@@ -424,8 +425,8 @@ public partial class fight : Control
 
     public class BigRock : PowerUp
     {
-        public static new string Name { get { return "Big Rock"; } }
-        public static new string Description { get { return "Your third Rock thrown in a row breaks ties"; } }
+        public override string Name { get { return BIGROCK_NAME; } }
+        public override string Description { get { return "Your third Rock thrown in a row breaks ties"; } }
 
         int ownerId;
         public BigRock(Player player)
@@ -462,8 +463,8 @@ public partial class fight : Control
 
     public class InARow : PowerUp
     {
-        public static new string Name { get { return "Streak Bonus"; } }
-        public static new string Description { get { return "Every hand you throw in a row is worth +1 more"; } }
+        public override string Name { get { return "Streak Bonus"; } }
+        public override string Description { get { return "Every hand you throw in a row is worth +1 more"; } }
         int ownerId;
         public InARow(Player player)
         {
@@ -494,8 +495,8 @@ public partial class fight : Control
 
     public class MindChange : PowerUp
     {
-        public static new string Name { get { return "Noncomittal"; } }
-        public static new string Description { get { return "+1 if you throw a different hand than before"; } }
+        public override string Name { get { return "Noncommittal"; } }
+        public override string Description { get { return "+1 if you throw a different hand than before"; } }
         int ownerId;
         public MindChange(Player player)
         {
