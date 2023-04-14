@@ -1,15 +1,19 @@
-[gd_scene load_steps=14 format=3 uid="uid://dnjrt0lngoro"]
+[gd_scene load_steps=16 format=3 uid="uid://bhgnrtnha444s"]
 
 [ext_resource type="Texture2D" uid="uid://bep1015jkmd0" path="res://assets/player sprites/cat.png" id="1_6l72s"]
 [ext_resource type="Script" path="res://scenes/screens/fight.cs" id="1_8ieqv"]
 [ext_resource type="FontFile" uid="uid://hl6niy0yebwr" path="res://assets/HelvetiPixel.ttf" id="1_ysk8r"]
-[ext_resource type="StyleBox" uid="uid://cd0iwwr6mbmwu" path="res://bluestyleboxflat.tres" id="3_fr701"]
-[ext_resource type="StyleBox" uid="uid://bfel3b86n2psb" path="res://scenes/screens/greenstyleboxflat.tres" id="4_it4ea"]
-[ext_resource type="Theme" uid="uid://bumnwnco8nxol" path="res://theme.tres" id="4_rvgd2"]
+[ext_resource type="StyleBox" uid="uid://bmam0s5q1d48v" path="res://assets/styleboxes/player0StyleBoxFlat.tres" id="3_clw57"]
+[ext_resource type="StyleBox" uid="uid://dx65m1812fflx" path="res://assets/styleboxes/player1Styleboxflat.tres" id="6_1kmkx"]
 [ext_resource type="Script" path="res://scenes/screens/TextBox.cs" id="6_ldefa"]
+[ext_resource type="StyleBox" uid="uid://dpqrp8hjb3jlg" path="res://assets/styleboxes/redstyleboxflat.tres" id="7_2wmkj"]
+[ext_resource type="StyleBox" uid="uid://bfel3b86n2psb" path="res://assets/styleboxes/greenstyleboxflat.tres" id="7_yqyqy"]
+[ext_resource type="StyleBox" uid="uid://6u5gh63rbuoq" path="res://assets/styleboxes/defaultstyleboxflat.tres" id="9_mtosu"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scxvc"]
-bg_color = Color(0, 0, 0, 0.513726)
+[sub_resource type="Theme" id="Theme_44hnx"]
+default_font = ExtResource("1_ysk8r")
+default_font_size = 48
+Panel/styles/panel = ExtResource("3_clw57")
 
 [sub_resource type="Theme" id="Theme_ix2i3"]
 
@@ -40,13 +44,13 @@ corner_radius_bottom_left = 15
 default_font = ExtResource("1_ysk8r")
 default_font_size = 32
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3dyfl"]
-bg_color = Color(0.882353, 0.470588, 0.317647, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_71mxb"]
+bg_color = Color(0.235294, 0.643137, 0.85098, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.647059, 0.14902, 0.14902, 1)
+border_color = Color(0.0784314, 0.211765, 0.501961, 1)
 
 [node name="fight" type="Control"]
 layout_mode = 3
@@ -55,6 +59,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("Theme_44hnx")
 script = ExtResource("1_8ieqv")
 
 [node name="LocalHBox" type="HBoxContainer" parent="."]
@@ -64,18 +69,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 1
 
 [node name="PlayerVBox0" type="VBoxContainer" parent="LocalHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
-alignment = 1
 
 [node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox0"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_styles/panel = SubResource("StyleBoxFlat_scxvc")
+theme_override_styles/panel = ExtResource("3_clw57")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="LocalHBox/PlayerVBox0/Panel"]
 layout_mode = 1
@@ -129,7 +133,7 @@ flip_h = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_styles/panel = SubResource("StyleBoxFlat_scxvc")
+theme_override_styles/panel = ExtResource("6_1kmkx")
 
 [node name="HandsHBox" type="HBoxContainer" parent="LocalHBox/PlayerVBox0/AttacksPanel"]
 layout_mode = 1
@@ -146,7 +150,7 @@ size_flags_horizontal = 3
 theme = SubResource("Theme_2sp6e")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
-theme_override_styles/normal = ExtResource("3_fr701")
+theme_override_styles/normal = SubResource("StyleBoxFlat_71mxb")
 text = "Rock: 1"
 
 [node name="PaperButton" type="Button" parent="LocalHBox/PlayerVBox0/AttacksPanel/HandsHBox"]
@@ -155,7 +159,7 @@ size_flags_horizontal = 3
 theme = SubResource("Theme_2sp6e")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
-theme_override_styles/normal = ExtResource("4_it4ea")
+theme_override_styles/normal = ExtResource("7_yqyqy")
 text = "Paper: 1"
 
 [node name="ScissorsButton" type="Button" parent="LocalHBox/PlayerVBox0/AttacksPanel/HandsHBox"]
@@ -164,20 +168,18 @@ size_flags_horizontal = 3
 theme = SubResource("Theme_2sp6e")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxFlat_3dyfl")
+theme_override_styles/normal = ExtResource("7_2wmkj")
 text = "Scissors: 1"
 
 [node name="PlayerVBox1" type="VBoxContainer" parent="LocalHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
-alignment = 1
 
 [node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox1"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_styles/panel = SubResource("StyleBoxFlat_scxvc")
+theme_override_styles/panel = ExtResource("6_1kmkx")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="LocalHBox/PlayerVBox1/Panel"]
 layout_mode = 1
@@ -230,7 +232,7 @@ stretch_mode = 3
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_styles/panel = SubResource("StyleBoxFlat_scxvc")
+theme_override_styles/panel = ExtResource("6_1kmkx")
 
 [node name="HandsHBox" type="HBoxContainer" parent="LocalHBox/PlayerVBox1/AttacksPanel"]
 layout_mode = 1
@@ -247,7 +249,7 @@ size_flags_horizontal = 3
 theme = SubResource("Theme_2sp6e")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
-theme_override_styles/normal = ExtResource("3_fr701")
+theme_override_styles/normal = SubResource("StyleBoxFlat_71mxb")
 text = "Rock: 1"
 
 [node name="PaperButton" type="Button" parent="LocalHBox/PlayerVBox1/AttacksPanel/HandsHBox"]
@@ -256,7 +258,7 @@ size_flags_horizontal = 3
 theme = SubResource("Theme_2sp6e")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
-theme_override_styles/normal = ExtResource("4_it4ea")
+theme_override_styles/normal = ExtResource("7_yqyqy")
 text = "Paper: 1"
 
 [node name="ScissorsButton" type="Button" parent="LocalHBox/PlayerVBox1/AttacksPanel/HandsHBox"]
@@ -265,41 +267,179 @@ size_flags_horizontal = 3
 theme = SubResource("Theme_2sp6e")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxFlat_3dyfl")
+theme_override_styles/normal = ExtResource("7_2wmkj")
 text = "Scissors: 1"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="UpgradesCanvas" type="CanvasLayer" parent="."]
 script = ExtResource("6_ldefa")
 
-[node name="TextboxMargin" type="MarginContainer" parent="CanvasLayer"]
-anchors_preset = 12
-anchor_top = 1.0
+[node name="UpgradesVBox" type="VBoxContainer" parent="UpgradesCanvas"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = -80.0
-offset_right = -16.0
-offset_bottom = -16.0
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
+alignment = 2
 
-[node name="GameLog" type="Panel" parent="CanvasLayer/TextboxMargin"]
-custom_minimum_size = Vector2(0, 80)
+[node name="UpgradesHBox" type="HBoxContainer" parent="UpgradesCanvas/UpgradesVBox"]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+alignment = 1
+
+[node name="MarginContainer0" type="MarginContainer" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CanvasLayer/TextboxMargin/GameLog"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer0"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Panel0" type="Panel" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer0/VBoxContainer"]
+custom_minimum_size = Vector2(350, 80)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_mtosu")
+
+[node name="Title" type="Label" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer0/VBoxContainer/Panel0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("4_rvgd2")
+theme_override_font_sizes/font_size = 64
+text = "Title"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel1" type="Panel" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer0/VBoxContainer"]
+custom_minimum_size = Vector2(350, 400)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_mtosu")
+
+[node name="Description" type="Label" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer0/VBoxContainer/Panel1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "description"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="MarginContainer1" type="MarginContainer" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer1"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Panel0" type="Panel" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer1/VBoxContainer"]
+custom_minimum_size = Vector2(350, 80)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_mtosu")
+
+[node name="Title" type="Label" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer1/VBoxContainer/Panel0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "Title"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel1" type="Panel" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer1/VBoxContainer"]
+custom_minimum_size = Vector2(350, 400)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_mtosu")
+
+[node name="Description" type="Label" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer1/VBoxContainer/Panel1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "description"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="MarginContainer2" type="MarginContainer" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer2"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Panel0" type="Panel" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(350, 80)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_mtosu")
+
+[node name="Title" type="Label" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer2/VBoxContainer/Panel0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "Title"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel1" type="Panel" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(350, 400)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_mtosu")
+
+[node name="Description" type="Label" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox/MarginContainer2/VBoxContainer/Panel1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "description"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="TextboxMargin" type="MarginContainer" parent="UpgradesCanvas/UpgradesVBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 11
+
+[node name="GameLog" type="Panel" parent="UpgradesCanvas/UpgradesVBox/TextboxMargin"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_mtosu")
+
+[node name="Label" type="Label" parent="UpgradesCanvas/UpgradesVBox/TextboxMargin/GameLog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_44hnx")
 text = "Begin"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RPSGoMargin" type="MarginContainer" parent="CanvasLayer"]
+[node name="RPSGoMargin" type="MarginContainer" parent="UpgradesCanvas"]
 visible = false
 anchors_preset = 14
 anchor_top = 0.5
@@ -310,120 +450,18 @@ offset_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GameLog" type="Panel" parent="CanvasLayer/RPSGoMargin"]
+[node name="GameLog" type="Panel" parent="UpgradesCanvas/RPSGoMargin"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CanvasLayer/RPSGoMargin/GameLog"]
+[node name="Label" type="Label" parent="UpgradesCanvas/RPSGoMargin/GameLog"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("4_rvgd2")
+theme = SubResource("Theme_44hnx")
 text = "Go"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="UpgradesHBox" type="HBoxContainer" parent="CanvasLayer"]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="MarginContainer0" type="MarginContainer" parent="CanvasLayer/UpgradesHBox"]
-layout_mode = 2
-
-[node name="Panel" type="Panel" parent="CanvasLayer/UpgradesHBox/MarginContainer0"]
-custom_minimum_size = Vector2(350, 0)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UpgradesHBox/MarginContainer0/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="Title" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer0/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "Title"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer0/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "description"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="MarginContainer1" type="MarginContainer" parent="CanvasLayer/UpgradesHBox"]
-layout_mode = 2
-
-[node name="Panel" type="Panel" parent="CanvasLayer/UpgradesHBox/MarginContainer1"]
-custom_minimum_size = Vector2(350, 0)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UpgradesHBox/MarginContainer1/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="Title" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer1/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "Title"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer1/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "description"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="MarginContainer2" type="MarginContainer" parent="CanvasLayer/UpgradesHBox"]
-layout_mode = 2
-
-[node name="Panel" type="Panel" parent="CanvasLayer/UpgradesHBox/MarginContainer2"]
-custom_minimum_size = Vector2(350, 0)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UpgradesHBox/MarginContainer2/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="Title" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer2/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "Title"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Description" type="Label" parent="CanvasLayer/UpgradesHBox/MarginContainer2/Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "description"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3

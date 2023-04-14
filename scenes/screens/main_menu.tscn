@@ -1,7 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://ctpio6oq2my8a"]
+[gd_scene load_steps=5 format=3 uid="uid://ctpio6oq2my8a"]
 
 [ext_resource type="Script" path="res://scenes/screens/main_menu.cs" id="1_7vgjy"]
-[ext_resource type="Theme" uid="uid://bumnwnco8nxol" path="res://theme.tres" id="2_kdaii"]
+[ext_resource type="StyleBox" uid="uid://bmam0s5q1d48v" path="res://assets/styleboxes/player0StyleBoxFlat.tres" id="2_i1g2j"]
+[ext_resource type="FontFile" uid="uid://hl6niy0yebwr" path="res://assets/HelvetiPixel.ttf" id="3_cf85g"]
+
+[sub_resource type="Theme" id="Theme_44hnx"]
+default_font = ExtResource("3_cf85g")
+default_font_size = 48
+Panel/styles/panel = ExtResource("2_i1g2j")
 
 [node name="MainMenu" type="MarginContainer"]
 anchors_preset = 15
@@ -26,10 +32,10 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer/TitleCenter"]
 layout_mode = 2
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 168
-text = "RPS Advanced"
+text = "RPS Evolved"
 
 [node name="SelectorsCenter" type="CenterContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -43,14 +49,14 @@ layout_mode = 2
 [node name="SelectorLabel" type="Label" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox/StartHBox"]
 custom_minimum_size = Vector2(37, 0)
 layout_mode = 2
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 84
 text = ">"
 
 [node name="StartLabel" type="Label" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox/StartHBox"]
 layout_mode = 2
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 84
 text = "Throw hands
@@ -62,14 +68,14 @@ layout_mode = 2
 [node name="SelectorLabel" type="Label" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox/OptionsHBox"]
 custom_minimum_size = Vector2(37, 0)
 layout_mode = 2
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 84
 text = ">"
 
 [node name="OptionsLabel" type="Label" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox/OptionsHBox"]
 layout_mode = 2
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 84
 text = "TBD"
@@ -80,14 +86,14 @@ layout_mode = 2
 [node name="SelectorLabel" type="Label" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox/ExitHBox"]
 custom_minimum_size = Vector2(37, 0)
 layout_mode = 2
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 84
 text = ">"
 
 [node name="ExitLabel" type="Label" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox/ExitHBox"]
 layout_mode = 2
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 84
 text = "Exit"
@@ -95,7 +101,7 @@ text = "Exit"
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 size_flags_vertical = 1
-theme = ExtResource("2_kdaii")
+theme = SubResource("Theme_44hnx")
 theme_override_font_sizes/font_size = 44
 text = "Twitter @Fandelix"
 vertical_alignment = 2
