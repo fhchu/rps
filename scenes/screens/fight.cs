@@ -8,13 +8,13 @@ public partial class fight : Control
     const string PLAYER_NODE_PATH = "LocalHBox/PlayerVBox";
     const string GAMELOG_PATH = "UpgradesCanvas/UpgradesVBox/TextboxMargin/GameLog";
     const string UPGRADES_PATH = "UpgradesCanvas/UpgradesVBox/UpgradesHBox";
-
+    const string RPSGO_PATH = "UpgradesCanvas/RPSGoMargin/GameLog";
     const string HANDS_UI_PATH = "/AttacksPanel/HandsHBox";
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
     const string BIGROCK_NAME = "Big Rock";
 
-    public enum Hand { ROCK, PAPER, SCISSORS }
+    public enum Hand { ROCK, PAPER, SCISSORS, NULL }
     public enum Operation { ADD, MULTIPLY, DIVIDE }
 
     private Player[] players;
@@ -27,15 +27,19 @@ public partial class fight : Control
     private bool isUpgradePhase;
     private int upgradeSelection;
     private int upgradingPlayer;
+    private bool isAnimating;
 
     Panel gameLog;
     Control upgradesControl;
+    Panel refereePanel;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
+        refereePanel = GetNode<Panel>(RPSGO_PATH);
         upgradesControl = GetNode<Control>(UPGRADES_PATH);
         gameLog = GetNode<Panel>(GAMELOG_PATH);
+        refereePanel.Hide();
         upgradesControl.Hide();
         gameLog.Hide();
         // we might want to have multiple phases one day
@@ -80,7 +84,7 @@ public partial class fight : Control
                 players[1].thrownHand = Hand.SCISSORS;
                 players[1].hasThrown = true;
             }
-            if (players[1].hasThrown && players[0].hasThrown)
+            if (players[1].hasThrown && players[0].hasThrown && !isAnimating)
             {
                 throwHands();
             }
@@ -160,7 +164,7 @@ public partial class fight : Control
                     }
                 }
             }
-
+            displayUpgradeBorder();
         }
     }
 
@@ -198,7 +202,22 @@ public partial class fight : Control
             updateHealth(player, phaseHealth);
             updateDamageUI(player);
         }
+        enableCombat();
+    }
+
+    private void enableCombat()
+    {
         isCombatEnabled = true;
+        //sayRPS();
+    }
+
+    private void sayRPS()
+    {
+        isAnimating = true;
+        Label label = refereePanel.GetNode<Label>("Label");
+        refereePanel.Show();
+        label.Text = "Rock Paper Scissors";
+        isAnimating = false;
     }
 
     //calculate damage and update UI text and color with those values
@@ -212,10 +231,39 @@ public partial class fight : Control
         player.calculateHandValues();
 
         Button handButton = GetNode<Button>(player.VBoxPath + HANDS_UI_PATH + "/" + "Rock" + "Button");
+        Panel panel = handButton.GetNode<Panel>("Panel");
+        if (player.thrownHand == Hand.ROCK)
+        {
+            panel.Show();
+        }
+        else
+        {
+            panel.Hide();
+        }
         handButton.Text = bigRock + "Rock" + ": " + player.realHandValues[0];
+
         handButton = GetNode<Button>(player.VBoxPath + HANDS_UI_PATH + "/" + "Paper" + "Button");
+        panel = handButton.GetNode<Panel>("Panel");
+        if (player.thrownHand == Hand.PAPER)
+        {
+            panel.Show();
+        }
+        else
+        {
+            panel.Hide();
+        }
         handButton.Text = "Paper" + ": " + player.realHandValues[1];
+
         handButton = GetNode<Button>(player.VBoxPath + HANDS_UI_PATH + "/" + "Scissors" + "Button");
+        panel = handButton.GetNode<Panel>("Panel");
+        if (player.thrownHand == Hand.SCISSORS)
+        {
+            panel.Show();
+        }
+        else
+        {
+            panel.Hide();
+        }
         handButton.Text = "Scissors" + ": " + player.realHandValues[2];
         //TODO make this green or red if it's bigger/smaller
         //if (value = player.baseHandValues)
@@ -225,6 +273,7 @@ public partial class fight : Control
     //calculate winner and apply damage
     private void throwHands()
     {
+        refereePanel.Hide();
         Player player0 = players[0];
         Player player1 = players[1];
         player0.hasThrown = false;
@@ -280,17 +329,45 @@ public partial class fight : Control
         updateDamageUI(player1);
     }
 
+    private void displayUpgradeBorder()
+    {
+        Panel panel0 = upgradesControl.GetNode<Panel>("MarginContainer0/OutlinePanel");
+        Panel panel1 = upgradesControl.GetNode<Panel>("MarginContainer1/OutlinePanel");
+        Panel panel2 = upgradesControl.GetNode<Panel>("MarginContainer2/OutlinePanel");
+        panel0.Hide();
+        panel1.Hide();
+        panel2.Hide();
+
+        if (upgradeSelection >= 0)
+        {
+
+            if (upgradeSelection == 0)
+            {
+                panel0.Show();
+            }
+            if (upgradeSelection == 1)
+            {
+                panel1.Show();
+            }
+            if (upgradeSelection == 2)
+            {
+                panel2.Show();
+            }
+        }
+    }
     private void selectUpgrade(Player player, int selection)
     {
         isUpgradePhase = false;
-        isCombatEnabled = true;
 
-        PowerUp selectedPowerUp = player.powerUpLibrary[selection];
+        PowerUp selectedPowerUp = player.powerUpLibrary[selection + 3 * player.currentUpgradePhase];
+        player.currentUpgradePhase++;
         player.powerUpsObtained.Add(selectedPowerUp.Name, selectedPowerUp);
         upgradesControl.Hide();
+        refereePanel.Hide();
         gameLog.Hide();
 
         updateDamageUI(player);
+        enableCombat();
     }
 
     private void endPhase(Player loser)
@@ -332,6 +409,7 @@ public partial class fight : Control
 
     private void startUpgradePhase(Player player)
     {
+        upgradesControl.Show();
         isUpgradePhase = true;
         upgradeSelection = -1;
         isCombatEnabled = false;
@@ -342,12 +420,13 @@ public partial class fight : Control
             Control marginContainer = (Control)upgrades.GetNode("MarginContainer" + i + "/VBoxContainer");
             Label titleLabel = (Label)marginContainer.GetNode("Panel0/Title");
             Label descriptionLabel = (Label)marginContainer.GetNode("Panel1/Description");
-            PowerUp powerUp = player.powerUpLibrary[i];
+            PowerUp powerUp = player.powerUpLibrary[i + 3 * player.currentUpgradePhase];
             titleLabel.Text = powerUp.Name;
             descriptionLabel.Text = powerUp.Description;
 
         }
-        gameLogDisplay("Player " + ++upgradingPlayer + " Double press rock/paper/scissors to Evolve");
+        int display = upgradingPlayer + 1;
+        gameLogDisplay("Player " + display + " Double press rock/paper/scissors to Evolve");
         gameLog.Show();
 
         StyleBox playerStyleBox = GetTree().Root.GetThemeStylebox("player" + player.playerId + "stylebox", "StyleBoxFlat");
@@ -396,18 +475,25 @@ public partial class fight : Control
         public Dictionary<string, PowerUp> powerUpsObtained;
         public Hand thrownHand;
         public bool hasThrown;
+        public int currentUpgradePhase;
+
         public Player(string path, int id)
         {
+            currentUpgradePhase = 0;
             playerId = id;
             VBoxPath = path;
             baseHandValues = new int[NUM_HANDS];
             realHandValues = new int[NUM_HANDS];
+            thrownHand = Hand.NULL;
             hasThrown = false;
             upgradeThresholds = new List<int>();
             powerUpLibrary = new List<PowerUp>();
-            powerUpLibrary.Add(new TieBonus(this));
-            powerUpLibrary.Add(new ChangeBonus(this));
-            powerUpLibrary.Add(new InARow(this));
+            powerUpLibrary.Add(new TieBonus());
+            powerUpLibrary.Add(new ChangeBonus());
+            powerUpLibrary.Add(new InARow());
+            powerUpLibrary.Add(new BigRock());
+            powerUpLibrary.Add(new WinMoreScissors());
+            powerUpLibrary.Add(new PaperSwap());
             powerUpsObtained = new Dictionary<string, PowerUp>();
         }
 
@@ -475,9 +561,14 @@ public partial class fight : Control
 
     public class BigRock : PowerUp
     {
+        public int roundObtained;
         public override string Name { get { return BIGROCK_NAME; } }
-        public override string Description { get { return "Every third Rock thrown in a row breaks Ties"; } }
+        public override string Description { get { return "Every third Rock thrown in a row is worth +3 and breaks Ties"; } }
 
+        public BigRock()
+        {
+            roundObtained = 0;
+        }
         public override bool isActive(Player player)
         {
             int ownerId = player.playerId;
@@ -486,14 +577,13 @@ public partial class fight : Control
             {
                 int i = numRounds - 1;
                 int rocks = 0;
-                while (i >= 0 && roundResults[i].playerHands[ownerId] == Hand.ROCK)
+                while (i > roundObtained && roundResults[i].playerHands[ownerId] == Hand.ROCK)
                 {
                     i--;
                     rocks++;
                 }
                 if ((rocks + 1) % 3 == 0)
                 {
-                    GD.Print("BigRockActive for player " + ownerId);
                     return true;
                 }
             }
@@ -502,7 +592,12 @@ public partial class fight : Control
         // this powerup does not affect damage and needs to be hardcoded in the combat section
         public override List<Multiplier> calculateDamage(Player player)
         {
-            return new List<Multiplier>();
+            List<Multiplier> powerup = new List<Multiplier>();
+            if (isActive(player))
+            {
+                powerup.Add(new Multiplier(Operation.ADD, 3, Hand.ROCK));
+            }
+            return powerup;
         }
     }
 
@@ -510,17 +605,13 @@ public partial class fight : Control
     {
         public override string Name { get { return "Streak Bonus"; } }
         public override string Description { get { return "+1 for each same hand you throw in a row"; } }
-        int ownerId;
-        public InARow(Player player)
-        {
-            ownerId = player.playerId;
-        }
         public override bool isActive(Player player)
         {
             return true;
         }
         public override List<Multiplier> calculateDamage(Player player)
         {
+            int ownerId = player.playerId;
             List<Multiplier> multipliers = new List<Multiplier>();
             if (roundResults.Count >= 1)
             {
@@ -542,19 +633,15 @@ public partial class fight : Control
 
     public class ChangeBonus : PowerUp
     {
-        public override string Name { get { return "Noncommittal"; } }
+        public override string Name { get { return "Unpredictable"; } }
         public override string Description { get { return "+1 if you throw a different hand than before"; } }
-        int ownerId;
-        public ChangeBonus(Player player)
-        {
-            ownerId = player.playerId;
-        }
         public override bool isActive(Player player)
         {
             return true;
         }
         public override List<Multiplier> calculateDamage(Player player)
         {
+            int ownerId = player.playerId;
             List<Multiplier> multipliers = new List<Multiplier>();
             if (roundResults.Count >= 1)
             {
@@ -574,12 +661,7 @@ public partial class fight : Control
     public class TieBonus : PowerUp
     {
         public override string Name { get { return "Silver Lining"; } }
-        public override string Description { get { return "+1 for each Tie in a row before you Win"; } }
-        int ownerId;
-        public TieBonus(Player player)
-        {
-            ownerId = player.playerId;
-        }
+        public override string Description { get { return "+2 for each Tie in a row before you Win"; } }
         public override bool isActive(Player player)
         {
             return roundResults[roundResults.Count - 1].winner == -1;
@@ -603,6 +685,58 @@ public partial class fight : Control
             multipliers.Add(new Multiplier(Operation.ADD, tieCount, Hand.PAPER));
             multipliers.Add(new Multiplier(Operation.ADD, tieCount, Hand.SCISSORS));
 
+            return multipliers;
+        }
+    }
+    public class WinMoreScissors : PowerUp
+    {
+        public int roundObtained;
+        public override string Name { get { return "When it Glides"; } }
+        public override string Description { get { return "+1 to Scissors every time you Win with Scissors"; } }
+
+        public WinMoreScissors()
+        {
+            roundObtained = 0;
+        }
+
+        public override bool isActive(Player player)
+        {
+            return true;
+        }
+        public override List<Multiplier> calculateDamage(Player player)
+        {
+            int playerId = player.playerId;
+            int winCount = 0;
+            for (int i = roundResults.Count - 1; i > roundObtained; i--)
+            {
+                RoundResult round = roundResults[i];
+                if (round.winner == playerId && round.playerHands[playerId] == Hand.SCISSORS)
+                {
+                    winCount++;
+                }
+            }
+            return new List<Multiplier>() { new Multiplier(Operation.ADD, winCount, Hand.SCISSORS) };
+        }
+
+    }
+
+    public class PaperSwap : PowerUp
+    {
+        public override string Name { get { return "Origami"; } }
+        public override string Description { get { return "+1 if your last hand was Paper"; } }
+        public override bool isActive(Player player)
+        {
+            return roundResults[roundResults.Count - 1].playerHands[player.playerId] == Hand.PAPER;
+        }
+        public override List<Multiplier> calculateDamage(Player player)
+        {
+            List<Multiplier> multipliers = new List<Multiplier>();
+            if (isActive(player))
+            {
+                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.ROCK));
+                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.PAPER));
+                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.SCISSORS));
+            }
             return multipliers;
         }
     }
