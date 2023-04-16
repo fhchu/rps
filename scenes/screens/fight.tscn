@@ -16,8 +16,6 @@ default_font = ExtResource("1_ysk8r")
 default_font_size = 48
 Panel/styles/panel = ExtResource("3_clw57")
 
-[sub_resource type="Theme" id="Theme_ix2i3"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u1jpp"]
 border_width_left = 1
 border_width_top = 1
@@ -41,6 +39,8 @@ corner_radius_top_right = 15
 corner_radius_bottom_right = 15
 corner_radius_bottom_left = 15
 
+[sub_resource type="Theme" id="Theme_ix2i3"]
+
 [sub_resource type="Theme" id="Theme_2sp6e"]
 default_font = ExtResource("1_ysk8r")
 default_font_size = 32
@@ -63,6 +63,15 @@ grow_vertical = 2
 theme = SubResource("Theme_44hnx")
 script = ExtResource("1_8ieqv")
 
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.145098, 0.145098, 0.372549, 1)
+
 [node name="LocalHBox" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -76,7 +85,35 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="HealthBar" type="ProgressBar" parent="LocalHBox/PlayerVBox0"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_u1jpp")
+theme_override_styles/fill = SubResource("StyleBoxFlat_npn0w")
+max_value = 3.0
+step = 1.0
+value = 2.0
+allow_greater = true
+fill_mode = 1
+show_percentage = false
+
+[node name="Label" type="Label" parent="LocalHBox/PlayerVBox0/HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_ysk8r")
+theme_override_font_sizes/font_size = 48
+text = "2/3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox0"]
+visible = false
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 8
@@ -99,31 +136,6 @@ theme_override_font_sizes/font_size = 32
 text = "Player 1"
 vertical_alignment = 1
 
-[node name="HealthBar" type="ProgressBar" parent="LocalHBox/PlayerVBox0"]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_u1jpp")
-theme_override_styles/fill = SubResource("StyleBoxFlat_npn0w")
-max_value = 3.0
-step = 1.0
-value = 2.0
-allow_greater = true
-show_percentage = false
-
-[node name="Label" type="Label" parent="LocalHBox/PlayerVBox0/HealthBar"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("1_ysk8r")
-theme_override_font_sizes/font_size = 48
-text = "2/3"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="TextureRect" type="TextureRect" parent="LocalHBox/PlayerVBox0"]
 layout_mode = 2
 texture = ExtResource("1_6l72s")
@@ -133,7 +145,7 @@ flip_h = true
 [node name="AttacksPanel" type="Panel" parent="LocalHBox/PlayerVBox0"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-size_flags_vertical = 8
+size_flags_vertical = 10
 theme_override_styles/panel = ExtResource("6_1kmkx")
 
 [node name="HandsHBox" type="HBoxContainer" parent="LocalHBox/PlayerVBox0/AttacksPanel"]
@@ -204,6 +216,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox1"]
+visible = false
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 8
@@ -229,6 +242,7 @@ vertical_alignment = 1
 [node name="HealthBar" type="ProgressBar" parent="LocalHBox/PlayerVBox1"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
+size_flags_vertical = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_u1jpp")
 theme_override_styles/fill = SubResource("StyleBoxFlat_npn0w")
 max_value = 3.0
@@ -259,7 +273,7 @@ stretch_mode = 3
 [node name="AttacksPanel" type="Panel" parent="LocalHBox/PlayerVBox1"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-size_flags_vertical = 8
+size_flags_vertical = 10
 theme_override_styles/panel = ExtResource("6_1kmkx")
 
 [node name="HandsHBox" type="HBoxContainer" parent="LocalHBox/PlayerVBox1/AttacksPanel"]
@@ -278,7 +292,8 @@ theme = SubResource("Theme_2sp6e")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_71mxb")
-text = "Rock: 1"
+text = "1
+Rock"
 
 [node name="Panel" type="Panel" parent="LocalHBox/PlayerVBox1/AttacksPanel/HandsHBox/RockButton"]
 layout_mode = 1

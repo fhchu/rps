@@ -240,7 +240,7 @@ public partial class fight : Control
         {
             panel.Hide();
         }
-        handButton.Text = bigRock + "Rock" + ": " + player.realHandValues[0];
+        handButton.Text = player.realHandValues[0] + "\n" + bigRock + "Rock";
 
         handButton = GetNode<Button>(player.VBoxPath + HANDS_UI_PATH + "/" + "Paper" + "Button");
         panel = handButton.GetNode<Panel>("Panel");
@@ -252,7 +252,7 @@ public partial class fight : Control
         {
             panel.Hide();
         }
-        handButton.Text = "Paper" + ": " + player.realHandValues[1];
+        handButton.Text = player.realHandValues[1] + "\n" + bigRock + "Paper";
 
         handButton = GetNode<Button>(player.VBoxPath + HANDS_UI_PATH + "/" + "Scissors" + "Button");
         panel = handButton.GetNode<Panel>("Panel");
@@ -264,7 +264,7 @@ public partial class fight : Control
         {
             panel.Hide();
         }
-        handButton.Text = "Scissors" + ": " + player.realHandValues[2];
+        handButton.Text = player.realHandValues[2] + "\n" + bigRock + "Scissors";
         //TODO make this green or red if it's bigger/smaller
         //if (value = player.baseHandValues)
 
