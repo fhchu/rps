@@ -6,10 +6,11 @@ public partial class fight : Control
 {
     //Allows us to access and update UI elements from this file
     const string PLAYER_NODE_PATH = "LocalHBox/PlayerVBox";
+    const string HEALTH_BAR_PATH = "/HealthBarMargin/BarVBox/HealthBar";
     const string GAMELOG_PATH = "UpgradesCanvas/UpgradesVBox/TextboxMargin/GameLog";
     const string UPGRADES_PATH = "UpgradesCanvas/UpgradesVBox/UpgradesHBox";
     const string RPSGO_PATH = "UpgradesCanvas/RPSGoMargin/GameLog";
-    const string HANDS_UI_PATH = "/AttacksPanel/HandsHBox";
+    const string HANDS_UI_PATH = "/MarginContainer/HandsHBox";
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
     const string BIGROCK_NAME = "Big Rock";
@@ -196,7 +197,7 @@ public partial class fight : Control
             Player player = players[i];
             player.maxHealth = phaseHealth;
 
-            string healthBarControl = player.VBoxPath + "/HealthBar";
+            string healthBarControl = player.VBoxPath + HEALTH_BAR_PATH;
             ProgressBar healthBar = GetNode<ProgressBar>(healthBarControl);
             healthBar.MaxValue = phaseHealth;
             updateHealth(player, phaseHealth);
@@ -208,15 +209,21 @@ public partial class fight : Control
     private void enableCombat()
     {
         isCombatEnabled = true;
-        //sayRPS();
+        sayRPS();
     }
 
-    private void sayRPS()
+    private async void sayRPS()
     {
         isAnimating = true;
         Label label = refereePanel.GetNode<Label>("Label");
         refereePanel.Show();
-        label.Text = "Rock Paper Scissors";
+        label.Text = "Rock";
+        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
+        label.Text = "Paper";
+        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
+        label.Text = "Scissors";
+        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
+        refereePanel.Hide();
         isAnimating = false;
     }
 
@@ -273,6 +280,7 @@ public partial class fight : Control
     //calculate winner and apply damage
     private void throwHands()
     {
+        isCombatEnabled = false;
         refereePanel.Hide();
         Player player0 = players[0];
         Player player1 = players[1];
@@ -315,20 +323,32 @@ public partial class fight : Control
             winnerPlayer = player1;
             loserPlayer = player0;
         }
+        displayWinner(winner);
         if (winner != -1)
         {
             int damage = winnerPlayer.realHandValues[(int)winnerPlayer.thrownHand];
             //1-x will flip 1 and 0
             damageArray[1 - winner] = damage;
-            updateHealth(loserPlayer, loserPlayer.currentHealth - damage);
+            if (updateHealth(loserPlayer, loserPlayer.currentHealth - damage))
+            {
+                enableCombat();
+            };
         }
-
+        else
+        {
+            enableCombat();
+        }
         roundResults.Add(new RoundResult(new Hand[] { player0.thrownHand, player1.thrownHand }, damageArray, winner));
 
         updateDamageUI(player0);
         updateDamageUI(player1);
+
     }
 
+    private void displayWinner(int winner)
+    {
+
+    }
     private void displayUpgradeBorder()
     {
         Panel panel0 = upgradesControl.GetNode<Panel>("MarginContainer0/OutlinePanel");
@@ -383,27 +403,29 @@ public partial class fight : Control
     }
 
     // the player knows their own max health. we are simply setting the health to this value.
-    // returns true or false based on ?? TODO
+    // returns true or false based on whether combat should immediately continue
     private bool updateHealth(Player player, int health)
     {
-        string healthBarControl = player.VBoxPath + "/HealthBar";
+        string healthBarControl = player.VBoxPath + HEALTH_BAR_PATH;
         ProgressBar healthBar = GetNode<ProgressBar>(healthBarControl);
         player.currentHealth = health;
         healthBar.Value = health;
         Label healthLabel = (Label)healthBar.GetChild(0);
-        healthLabel.Text = player.currentHealth + "/ " + player.maxHealth;
+        healthLabel.Text = player.currentHealth.ToString();
 
         if (player.currentHealth <= 0)
         {
             endPhase(player);
+            return false;
         }
-        else if (player.upgradeThresholds.Count > 0 && player.currentHealth <= player.maxHealth - player.upgradeThresholds[0])
+        if (player.upgradeThresholds.Count > 0 && player.currentHealth <= player.maxHealth - player.upgradeThresholds[0])
         {
             player.upgradeThresholds.RemoveAt(0);
             startUpgradePhase(player);
+            return false;
         }
 
-        return false;
+        return true;
     }
 
 
@@ -692,7 +714,7 @@ public partial class fight : Control
     {
         public int roundObtained;
         public override string Name { get { return "When it Glides"; } }
-        public override string Description { get { return "+1 to Scissors every time you Win with Scissors"; } }
+        public override string Description { get { return "+1 to Scissors permanently every time you Win with Scissors"; } }
 
         public WinMoreScissors()
         {
