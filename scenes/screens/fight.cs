@@ -7,12 +7,15 @@ public partial class fight : Control
     //Allows us to access and update UI elements from this file
     const string PLAYER_NODE_PATH = "LocalHBox/PlayerVBox";
     const string HEALTH_BAR_PATH = "/HealthBarMargin/BarVBox/HealthBar";
+    const string EXP_BAR_PATH = "/HealthBarMargin/BarVBox/ExpBar";
     const string GAMELOG_PATH = "UpgradesCanvas/UpgradesVBox/TextboxMargin/GameLog";
     const string UPGRADES_PATH = "UpgradesCanvas/UpgradesVBox/UpgradesHBox";
     const string RPSGO_PATH = "UpgradesCanvas/RPSGoMargin/GameLog";
     const string HANDS_UI_PATH = "/MarginContainer/HandsHBox";
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
+    // we might want to have different/separate player health someday but not right now
+    const int PLAYER_HEALTH = 20;
     const string BIGROCK_NAME = "Big Rock";
 
     public enum Hand { ROCK, PAPER, SCISSORS, NULL }
@@ -21,13 +24,13 @@ public partial class fight : Control
     private Player[] players;
     private static List<RoundResult> roundResults;
     // this is an array because we might want more phases in the future
-    private int[] phaseHealth = { 20 };
-    private int totalPhases = 1;
-    private int currentPhase;
+    //private int[] phaseHealth = { 20 };
+    //private int totalPhases = 1;
+    //private int currentPhase;
     private bool isCombatEnabled;
     private bool isUpgradePhase;
-    private int upgradeSelection;
     private int upgradingPlayer;
+    private int upgradeSelection;
     private bool isAnimating;
 
     Panel gameLog;
@@ -44,10 +47,10 @@ public partial class fight : Control
         upgradesControl.Hide();
         gameLog.Hide();
         // we might want to have multiple phases one day
-        currentPhase = 0;
+        //currentPhase = 0;
         setUpPlayers();
         roundResults = new List<RoundResult>();
-        startPhase(phaseHealth[currentPhase]);
+        startGame(PLAYER_HEALTH);
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -87,7 +90,7 @@ public partial class fight : Control
             }
             if (players[1].hasThrown && players[0].hasThrown && !isAnimating)
             {
-                throwHands();
+                calculateDamage();
             }
         }
         else if (isUpgradePhase)
@@ -165,66 +168,123 @@ public partial class fight : Control
                     }
                 }
             }
-            displayUpgradeBorder();
+            displayUpgradeOutline();
         }
     }
 
     // build players before game starts.
-    // we set HP 
+    // we setup HP and exp bars
     private void setUpPlayers()
     {
         players = new Player[NUM_PLAYERS];
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
-            Player player = new Player(PLAYER_NODE_PATH + i, i);
+            // perhaps we can have different exp required per player? 
+            // level exp must be added in ascending order (or we're buggin out!!)
+            List<int> expLevels = new List<int>() { 5, 13 };
+
+            List<PowerUp> powerUpLibrary = new List<PowerUp>();
+            powerUpLibrary.Add(new TieBonus());
+            powerUpLibrary.Add(new ChangeBonus());
+            powerUpLibrary.Add(new InARow());
+            powerUpLibrary.Add(new BigRock());
+            powerUpLibrary.Add(new WinMoreScissors());
+            powerUpLibrary.Add(new PaperSwap());
+
+            Player player = new Player(i, PLAYER_NODE_PATH + i, expLevels, powerUpLibrary);
 
             players[i] = player;
             // player does not handle setting of their own powers
             setAllHands(player, 1, 1, 1);
-            // perhaps we can have different upgrade thresholds per player? 
-            //player thresholds must be added in ascending order and cannot be higher than maxHealth (or we're buggin out!!)
-            player.upgradeThresholds.Add(3);
-            player.upgradeThresholds.Add(10);
         }
     }
 
-    // sets up fighting once upgrades have been taken
-    private void startPhase(int phaseHealth)
+    //update all 3 hands at once
+    private void setAllHands(Player player, int rockValue, int paperValue, int scissorsValue)
     {
-        currentPhase += 1;
+        setBaseHandPower(player, Hand.ROCK, rockValue);
+        setBaseHandPower(player, Hand.PAPER, paperValue);
+        setBaseHandPower(player, Hand.SCISSORS, scissorsValue);
+    }
+
+    //updates the player's base hand power in backend 
+    private void setBaseHandPower(Player player, Hand hand, int value)
+    {
+        player.baseHandValues[(int)hand] = value;
+    }
+
+    // sets up fighting once upgrades have been taken
+    private void startGame(int gameHealth)
+    {
+        //currentPhase += 1;
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
             Player player = players[i];
-            player.maxHealth = phaseHealth;
+            player.maxHealth = gameHealth;
 
             string healthBarControl = player.VBoxPath + HEALTH_BAR_PATH;
             ProgressBar healthBar = GetNode<ProgressBar>(healthBarControl);
-            healthBar.MaxValue = phaseHealth;
-            updateHealth(player, phaseHealth);
+            healthBar.MaxValue = gameHealth;
+
+            updateHealth(player, gameHealth);
+
+            player.maxExp = player.expLevels[player.level];
+            updateExp(player, 0, true);
             updateDamageUI(player);
         }
         enableCombat();
     }
 
-    private void enableCombat()
+    // the player knows their own max health. we are simply setting the health to this value.
+    // returns true if combat should immediately continue, else false
+    private bool updateHealth(Player player, int health)
     {
-        isCombatEnabled = true;
-        sayRPS();
+        string healthBarControl = player.VBoxPath + HEALTH_BAR_PATH;
+        ProgressBar healthBar = GetNode<ProgressBar>(healthBarControl);
+        player.currentHealth = health;
+        healthBar.Value = health;
+        Label healthLabel = (Label)healthBar.GetChild(0);
+        healthLabel.Text = player.currentHealth.ToString();
+
+        if (player.currentHealth <= 0)
+        {
+            endGame(player);
+            return false;
+        }
+
+        return true;
     }
 
-    private async void sayRPS()
+    // we update exp ui and start upgrade phase if necessary
+    // returns true if we started upgrade phase, else false
+    private bool updateExp(Player player, int exp, bool canLevel)
     {
-        isAnimating = true;
-        Label label = refereePanel.GetNode<Label>("Label");
-        refereePanel.Show();
-        label.Text = "Rock";
-        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
-        label.Text = "Paper";
-        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
-        label.Text = "Scissors";
-        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
-        refereePanel.Hide();
-        isAnimating = false;
+        string expControlPath = player.VBoxPath + EXP_BAR_PATH;
+        ProgressBar expBar = GetNode<ProgressBar>(expControlPath);
+        Label expLabel = (Label)expBar.GetChild(0);
+
+        if (player.isMaxLevel())
+        {
+            expBar.Value = 0;
+            expBar.MaxValue = 1;
+            expLabel.Text = "MAX";
+            return false;
+        }
+
+        expBar.Value = exp;
+        expBar.MaxValue = player.maxExp;
+        expLabel.Text = exp + "/" + player.maxExp;
+
+        player.currentExp = exp;
+
+        if (canLevel && player.currentExp >= player.maxExp)
+        {
+            displayUpgrades(player);
+
+            return true;
+        }
+
+        return false;
     }
 
     //calculate damage and update UI text and color with those values
@@ -259,7 +319,7 @@ public partial class fight : Control
         {
             panel.Hide();
         }
-        handButton.Text = player.realHandValues[1] + "\n" + bigRock + "Paper";
+        handButton.Text = player.realHandValues[1] + "\n" + "Paper";
 
         handButton = GetNode<Button>(player.VBoxPath + HANDS_UI_PATH + "/" + "Scissors" + "Button");
         panel = handButton.GetNode<Panel>("Panel");
@@ -271,14 +331,36 @@ public partial class fight : Control
         {
             panel.Hide();
         }
-        handButton.Text = player.realHandValues[2] + "\n" + bigRock + "Scissors";
+        handButton.Text = player.realHandValues[2] + "\n" + "Scissors";
         //TODO make this green or red if it's bigger/smaller
-        //if (value = player.baseHandValues)
+    }
 
+
+
+    // activate combat polling for input and play RPSGO animation
+    private void enableCombat()
+    {
+        isCombatEnabled = true;
+        sayRPS();
+    }
+
+    private async void sayRPS()
+    {
+        isAnimating = true;
+        Label label = refereePanel.GetNode<Label>("Label");
+        refereePanel.Show();
+        label.Text = "Rock";
+        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
+        label.Text = "Paper";
+        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
+        label.Text = "Scissors";
+        await ToSignal(GetTree().CreateTimer(0.35f), SceneTreeTimer.SignalName.Timeout);
+        refereePanel.Hide();
+        isAnimating = false;
     }
 
     //calculate winner and apply damage
-    private void throwHands()
+    private void calculateDamage()
     {
         isCombatEnabled = false;
         refereePanel.Hide();
@@ -289,6 +371,7 @@ public partial class fight : Control
         int winner = -1;
         Player winnerPlayer = player0;
         Player loserPlayer = player1;
+        // this is an array because maybe both players can take damage
         int[] damageArray = new int[2];
         //tie case
         if (player0.thrownHand == player1.thrownHand)
@@ -323,19 +406,30 @@ public partial class fight : Control
             winnerPlayer = player1;
             loserPlayer = player0;
         }
-        displayWinner(winner);
+        displayRoundWinner(winner);
+        int baseExp = 1;
         if (winner != -1)
         {
             int damage = winnerPlayer.realHandValues[(int)winnerPlayer.thrownHand];
             //1-x will flip 1 and 0
             damageArray[1 - winner] = damage;
+
+
             if (updateHealth(loserPlayer, loserPlayer.currentHealth - damage))
             {
                 enableCombat();
             };
+            bool canLevel = false;
+            if (!updateExp(loserPlayer, loserPlayer.currentExp + damage + baseExp, true))
+            {
+                canLevel = true;
+            }
+            updateExp(winnerPlayer, winnerPlayer.currentExp + baseExp, canLevel);
         }
         else
         {
+            updateExp(loserPlayer, Math.Min(loserPlayer.currentExp + baseExp, loserPlayer.maxExp), false);
+            updateExp(winnerPlayer, Math.Min(winnerPlayer.currentExp + baseExp, winnerPlayer.maxExp), false);
             enableCombat();
         }
         roundResults.Add(new RoundResult(new Hand[] { player0.thrownHand, player1.thrownHand }, damageArray, winner));
@@ -344,12 +438,44 @@ public partial class fight : Control
         updateDamageUI(player1);
 
     }
-
-    private void displayWinner(int winner)
+    //TODO explain who won the last round
+    private void displayRoundWinner(int winner)
     {
 
     }
-    private void displayUpgradeBorder()
+
+    // show the upgrade UI. does not handle upgrade logic
+    private void displayUpgrades(Player player)
+    {
+        isCombatEnabled = false;
+        isUpgradePhase = true;
+        upgradesControl.Show();
+        upgradeSelection = -1;
+        upgradingPlayer = player.playerId;
+        Control upgrades = GetNode<Control>(UPGRADES_PATH);
+        for (int i = 0; i < NUM_HANDS; i++)
+        {
+            Control marginContainer = (Control)upgrades.GetNode("MarginContainer" + i + "/VBoxContainer");
+            Label titleLabel = (Label)marginContainer.GetNode("Panel0/Title");
+            Label descriptionLabel = (Label)marginContainer.GetNode("Panel1/Description");
+            PowerUp powerUp = player.powerUpLibrary[i + 3 * player.level];
+            titleLabel.Text = powerUp.Name;
+            descriptionLabel.Text = powerUp.Description;
+
+        }
+        int display = upgradingPlayer + 1;
+        gameLogDisplay("Player " + display + " Double press rock/paper/scissors to Evolve");
+        gameLog.Show();
+
+        // change the color of the box ?
+        //StyleBox playerStyleBox = GetTree().Root.GetThemeStylebox("player" + player.playerId + "stylebox", "StyleBoxFlat");
+        //GD.Print(playerStyleBox);
+        //gameLog.AddThemeStyleboxOverride("normal", playerStyleBox);
+        upgrades.Show();
+    }
+
+    // display color highlight for chosen upgrade
+    private void displayUpgradeOutline()
     {
         Panel panel0 = upgradesControl.GetNode<Panel>("MarginContainer0/OutlinePanel");
         Panel panel1 = upgradesControl.GetNode<Panel>("MarginContainer1/OutlinePanel");
@@ -375,112 +501,52 @@ public partial class fight : Control
             }
         }
     }
+
+    // handle the logic of picking an upgrade
     private void selectUpgrade(Player player, int selection)
     {
         isUpgradePhase = false;
 
-        PowerUp selectedPowerUp = player.powerUpLibrary[selection + 3 * player.currentUpgradePhase];
-        player.currentUpgradePhase++;
+        PowerUp selectedPowerUp = player.powerUpLibrary[selection + 3 * player.level];
+        player.level++;
         player.powerUpsObtained.Add(selectedPowerUp.Name, selectedPowerUp);
         upgradesControl.Hide();
         refereePanel.Hide();
         gameLog.Hide();
 
         updateDamageUI(player);
-        enableCombat();
-    }
-
-    private void endPhase(Player loser)
-    {
-        if (currentPhase == totalPhases)
+        int newExp = player.currentExp - player.maxExp;
+        if (!player.isMaxLevel())
         {
-            //TODO move this to "end game" function if necessary
-            gameLogDisplay("Game Over!");
-            TextureRect loserPic = GetNode<TextureRect>(loser.VBoxPath + "/TextureRect");
-            loserPic.FlipV = true;
-            isCombatEnabled = false;
+            player.maxExp = player.expLevels[player.level];
+        }
+        bool reUpgrade = updateExp(player, newExp, true);
+
+        // check if opponent can upgrade. if we didn't upgrade and neither do they, we fight
+        Player opponent = players[1 - player.playerId];
+        if (!reUpgrade && !updateExp(opponent, opponent.currentExp, true))
+        {
+            enableCombat();
         }
     }
 
-    // the player knows their own max health. we are simply setting the health to this value.
-    // returns true or false based on whether combat should immediately continue
-    private bool updateHealth(Player player, int health)
+    // when one player has 0 exp, the game is over
+    private void endGame(Player loser)
     {
-        string healthBarControl = player.VBoxPath + HEALTH_BAR_PATH;
-        ProgressBar healthBar = GetNode<ProgressBar>(healthBarControl);
-        player.currentHealth = health;
-        healthBar.Value = health;
-        Label healthLabel = (Label)healthBar.GetChild(0);
-        healthLabel.Text = player.currentHealth.ToString();
-
-        if (player.currentHealth <= 0)
-        {
-            endPhase(player);
-            return false;
-        }
-        if (player.upgradeThresholds.Count > 0 && player.currentHealth <= player.maxHealth - player.upgradeThresholds[0])
-        {
-            player.upgradeThresholds.RemoveAt(0);
-            startUpgradePhase(player);
-            return false;
-        }
-
-        return true;
-    }
-
-
-    private void startUpgradePhase(Player player)
-    {
-        upgradesControl.Show();
-        isUpgradePhase = true;
-        upgradeSelection = -1;
+        gameLogDisplay("Game Over!");
+        TextureRect loserPic = GetNode<TextureRect>(loser.VBoxPath + "/TextureRect");
+        loserPic.FlipV = true;
         isCombatEnabled = false;
-        upgradingPlayer = player.playerId;
-        Control upgrades = GetNode<Control>(UPGRADES_PATH);
-        for (int i = 0; i < NUM_HANDS; i++)
-        {
-            Control marginContainer = (Control)upgrades.GetNode("MarginContainer" + i + "/VBoxContainer");
-            Label titleLabel = (Label)marginContainer.GetNode("Panel0/Title");
-            Label descriptionLabel = (Label)marginContainer.GetNode("Panel1/Description");
-            PowerUp powerUp = player.powerUpLibrary[i + 3 * player.currentUpgradePhase];
-            titleLabel.Text = powerUp.Name;
-            descriptionLabel.Text = powerUp.Description;
-
-        }
-        int display = upgradingPlayer + 1;
-        gameLogDisplay("Player " + display + " Double press rock/paper/scissors to Evolve");
-        gameLog.Show();
-
-        StyleBox playerStyleBox = GetTree().Root.GetThemeStylebox("player" + player.playerId + "stylebox", "StyleBoxFlat");
-        GD.Print(playerStyleBox);
-        gameLog.AddThemeStyleboxOverride("normal", playerStyleBox);
-        upgrades.Show();
     }
 
-    //updates the player's hand power in backend 
-    // TODO delete ?? and UI
-    private void setBaseHandPower(Player player, Hand hand, int value)
-    {
-        player.baseHandValues[(int)hand] = value;
-        //string handName = hand.ToString();
-        //Button handButton = (Button)GetNode(player.VBoxPath + HANDS_UI_PATH + "/" + handName + "Button");
-        //handButton.Text = handName + ": " + value;
-    }
-
-    //update all 3 hands at once
-    private void setAllHands(Player player, int rockValue, int paperValue, int scissorsValue)
-    {
-        setBaseHandPower(player, Hand.ROCK, rockValue);
-        setBaseHandPower(player, Hand.PAPER, paperValue);
-        setBaseHandPower(player, Hand.SCISSORS, scissorsValue);
-    }
-
+    // display text on the thing on the
     private void gameLogDisplay(string labelText)
     {
         gameLog.Show();
         Label gameLogLabel = (Label)gameLog.GetNode("Label");
         gameLogLabel.Text = labelText;
     }
+
     // hold the player data. player object does NOT handle their own UI
     public class Player
     {
@@ -488,34 +554,33 @@ public partial class fight : Control
         public string VBoxPath;
         public int maxHealth;
         public int currentHealth;
+        public int level;
+
+        public int currentExp;
+        public int maxExp;
         //these are white (unconditional) hand values
         // rock = 0, paper = 1, scissors = 2
         public int[] baseHandValues;
         public int[] realHandValues;
         public List<PowerUp> powerUpLibrary;
-        public List<int> upgradeThresholds;
+        public List<int> expLevels;
+        public List<int> levelUpRounds;
         public Dictionary<string, PowerUp> powerUpsObtained;
         public Hand thrownHand;
         public bool hasThrown;
-        public int currentUpgradePhase;
 
-        public Player(string path, int id)
+        public Player(int id, string path, List<int> expLevels, List<PowerUp> powerUpLibrary)
         {
-            currentUpgradePhase = 0;
-            playerId = id;
             VBoxPath = path;
+            playerId = id;
+            this.expLevels = expLevels;
+            this.powerUpLibrary = powerUpLibrary;
+
+            level = 0;
             baseHandValues = new int[NUM_HANDS];
             realHandValues = new int[NUM_HANDS];
             thrownHand = Hand.NULL;
             hasThrown = false;
-            upgradeThresholds = new List<int>();
-            powerUpLibrary = new List<PowerUp>();
-            powerUpLibrary.Add(new TieBonus());
-            powerUpLibrary.Add(new ChangeBonus());
-            powerUpLibrary.Add(new InARow());
-            powerUpLibrary.Add(new BigRock());
-            powerUpLibrary.Add(new WinMoreScissors());
-            powerUpLibrary.Add(new PaperSwap());
             powerUpsObtained = new Dictionary<string, PowerUp>();
         }
 
@@ -534,6 +599,16 @@ public partial class fight : Control
             {
                 realHandValues[(int)multiplier.hand] += multiplier.value;
             }
+        }
+
+        public bool isMaxLevel()
+        {
+            return level >= expLevels.Count;
+        }
+
+        public bool isMaxExp()
+        {
+            return currentExp >= maxExp;
         }
     }
 
