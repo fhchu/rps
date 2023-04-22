@@ -11,7 +11,8 @@ public partial class fight : Control
     const string GAMELOG_PATH = "UpgradesCanvas/UpgradesVBox/TextboxMargin/GameLog";
     const string UPGRADES_PATH = "UpgradesCanvas/UpgradesVBox/UpgradesHBox";
     const string RPSGO_PATH = "UpgradesCanvas/RPSGoMargin/GameLog";
-    const string HANDS_UI_PATH = "/MarginContainer/HandsHBox";
+    const string HANDS_UI_PATH = "/HandsMargin/HandsHBox";
+    const string SPRITE_UI_PATH = "/PlayerTexture";
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
     // we might want to have different/separate player health someday but not right now
