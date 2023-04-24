@@ -6,7 +6,7 @@
 
 [resource]
 default_font = ExtResource("3_q2q5s")
-default_font_size = 32
+default_font_size = 48
 /styles/player0stylebox = ExtResource("1_5767j")
 /styles/player1stylebox = ExtResource("2_5dxy8")
 Panel/styles/panel = ExtResource("1_5767j")

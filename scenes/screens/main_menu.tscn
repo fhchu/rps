@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://ctpio6oq2my8a"]
+[gd_scene load_steps=6 format=3 uid="uid://ctpio6oq2my8a"]
 
 [ext_resource type="Script" path="res://scenes/screens/main_menu.cs" id="1_7vgjy"]
+[ext_resource type="Theme" uid="uid://gefladbfxnyk" path="res://theme.tres" id="1_c8xne"]
 [ext_resource type="StyleBox" uid="uid://bmam0s5q1d48v" path="res://assets/styleboxes/player0StyleBoxFlat.tres" id="2_i1g2j"]
 [ext_resource type="FontFile" uid="uid://hl6niy0yebwr" path="res://assets/HelvetiPixel.ttf" id="3_cf85g"]
 
@@ -15,6 +16,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_c8xne")
 script = ExtResource("1_7vgjy")
 
 [node name="ColorRect" type="ColorRect" parent="."]

@@ -410,7 +410,7 @@ public partial class fight : Control
             winnerPlayer = player1;
             loserPlayer = player0;
         }
-        displayRoundWinner(winner);
+        sayRoundWinner(winner);
         int baseExp = 1;
         if (winner != -1)
         {
@@ -443,8 +443,28 @@ public partial class fight : Control
 
     }
     //TODO explain who won the last round
-    private void displayRoundWinner(int winner)
+    private async void sayRoundWinner(int winner)
     {
+        bool isTie = false;
+        if (winner == -1)
+        {
+            isTie = true;
+            winner = 0;
+        }
+        int loser = 1 - winner;
+        TextureRect winnerPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + winner + SPRITE_UI_PATH);
+        Label winnerLabel = winnerPicture.GetChild<Label>(0);
+
+        TextureRect loserPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + loser + SPRITE_UI_PATH);
+        Label loserLabel = loserPicture.GetChild<Label>(0);
+
+        if (!isTie)
+        {
+            winnerPicture.Texture =
+            winnerLabel.Show();
+            await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
+            winnerLabel.Hide();
+        }
 
     }
 
@@ -886,7 +906,7 @@ public partial class fight : Control
 
     public class PowerUp3 : PowerUp
     {
-        public override string Name { get { return "Timmy"; } }
+        public override string Name { get { return "Johnny"; } }
         public override string Description { get { return "+1 if your last hand was Paper"; } }
         public override bool isActive(Player player)
         {

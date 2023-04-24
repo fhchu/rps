@@ -159,6 +159,7 @@ stretch_mode = 3
 flip_h = true
 
 [node name="Label" type="Label" parent="LocalHBox/PlayerVBox0/PlayerTexture"]
+visible = false
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -336,6 +337,7 @@ texture = ExtResource("1_6l72s")
 stretch_mode = 3
 
 [node name="Label" type="Label" parent="LocalHBox/PlayerVBox1/PlayerTexture"]
+visible = false
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -615,7 +617,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_xkxst")
 text = "Begin"
 horizontal_alignment = 1
 vertical_alignment = 1
