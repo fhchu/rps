@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public partial class fight : Control
 {
@@ -33,6 +34,8 @@ public partial class fight : Control
     private int upgradingPlayer;
     private int upgradeSelection;
     private bool isAnimating;
+
+    private bool animationsEnabled = false;
 
     Panel gameLog;
     Control upgradesControl;
@@ -350,6 +353,10 @@ public partial class fight : Control
 
     private async void sayRPS()
     {
+        if (!animationsEnabled)
+        {
+            return;
+        }
         isAnimating = true;
         Label label = refereePanel.GetNode<Label>("Label");
         refereePanel.Show();
@@ -364,7 +371,7 @@ public partial class fight : Control
     }
 
     //calculate winner and apply damage
-    private void calculateDamage()
+    private async void calculateDamage()
     {
         isCombatEnabled = false;
         refereePanel.Hide();
@@ -410,7 +417,7 @@ public partial class fight : Control
             winnerPlayer = player1;
             loserPlayer = player0;
         }
-        sayRoundWinner(winner);
+        await sayRoundWinner(winner);
         int baseExp = 1;
         if (winner != -1)
         {
@@ -419,16 +426,19 @@ public partial class fight : Control
             damageArray[1 - winner] = damage;
 
 
+            // enable combat if we're not dead
             if (updateHealth(loserPlayer, loserPlayer.currentHealth - damage))
             {
-                enableCombat();
-            };
-            bool canLevel = false;
-            if (!updateExp(loserPlayer, loserPlayer.currentExp + damage + baseExp, true))
-            {
-                canLevel = true;
+                // if the loser upgrade phase didn't start, we try the winner upgrade phase now. 
+                // otherwise it will check after the loser upgrade phase completes.
+                bool didUpgrade = updateExp(loserPlayer, loserPlayer.currentExp + damage + baseExp, true);
+                didUpgrade = didUpgrade || updateExp(winnerPlayer, winnerPlayer.currentExp + baseExp, didUpgrade);
+
+                if (!didUpgrade)
+                {
+                    enableCombat();
+                }
             }
-            updateExp(winnerPlayer, winnerPlayer.currentExp + baseExp, canLevel);
         }
         else
         {
@@ -442,9 +452,14 @@ public partial class fight : Control
         updateDamageUI(player1);
 
     }
-    //TODO explain who won the last round
-    private async void sayRoundWinner(int winner)
+
+    // explain who won the last round
+    private async Task sayRoundWinner(int winner)
     {
+        if (!animationsEnabled)
+        {
+            return;
+        }
         bool isTie = false;
         if (winner == -1)
         {
@@ -458,14 +473,32 @@ public partial class fight : Control
         TextureRect loserPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + loser + SPRITE_UI_PATH);
         Label loserLabel = loserPicture.GetChild<Label>(0);
 
-        if (!isTie)
+        float waitTime = 0.45f;
+        if (isTie)
         {
-            winnerPicture.Texture =
+            winnerLabel.Text = "Tie";
+            loserLabel.Text = "Tie";
             winnerLabel.Show();
-            await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
+            loserLabel.Show();
+            await ToSignal(GetTree().CreateTimer(waitTime), SceneTreeTimer.SignalName.Timeout);
             winnerLabel.Hide();
+            loserLabel.Hide();
         }
+        else
+        {
+            var happyPicture = GD.Load<Texture2D>("res://assets/player sprites/catHappy.png");
+            var defaultPicture = GD.Load<Texture2D>("res://assets/player sprites/catDefault.png");
+            var sadPicture = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
 
+            winnerPicture.Texture = happyPicture;
+            loserPicture.Texture = sadPicture;
+            winnerLabel.Text = "Win!";
+            winnerLabel.Show();
+            await ToSignal(GetTree().CreateTimer(waitTime), SceneTreeTimer.SignalName.Timeout);
+            winnerLabel.Hide();
+            winnerPicture.Texture = defaultPicture;
+            loserPicture.Texture = defaultPicture;
+        }
     }
 
     // show the upgrade UI. does not handle upgrade logic
@@ -554,11 +587,13 @@ public partial class fight : Control
         }
     }
 
-    // when one player has 0 exp, the game is over
+    // when one player has 0 hp, the game is over
     private void endGame(Player loser)
     {
         gameLogDisplay("Game Over!");
-        TextureRect loserPic = GetNode<TextureRect>(loser.VBoxPath + "/TextureRect");
+        TextureRect loserPic = GetNode<TextureRect>(PLAYER_NODE_PATH + loser + SPRITE_UI_PATH);
+        var sadPicture = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
+        loserPic.Texture = sadPicture;
         loserPic.FlipV = true;
         isCombatEnabled = false;
     }
@@ -768,6 +803,8 @@ public partial class fight : Control
         }
     }
 
+    // old bigrock implementation. saving for later
+    /*
     public class BigRock : PowerUp
     {
         public int roundObtained;
@@ -807,6 +844,41 @@ public partial class fight : Control
             }
             return powerup;
         }
+    } */
+
+    public class BigRock : PowerUp{
+        public override string Name { get { return BIGROCK_NAME; } }
+        public override string Description { get { return "Every Rock thrown in a row is worth +2 more. Rocks worth at least 5 break ties"; } }
+        public override bool isActive(Player player)
+        {
+            int ownerId = player.playerId;
+            int numRounds = roundResults.Count;
+            if (numRounds >= 2)
+            {
+                int i = numRounds - 1;
+                int rocks = 0;
+                while (i > roundObtained && roundResults[i].playerHands[ownerId] == Hand.ROCK)
+                {
+                    i--;
+                    rocks++;
+                }
+                if ((rocks + 1) % 3 == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public override List<Multiplier> calculateDamage(Player player)
+        {
+            List<Multiplier> powerup = new List<Multiplier>();
+            if (isActive(player))
+            {
+                powerup.Add(new Multiplier(Operation.ADD, 3, Hand.ROCK));
+            }
+            return powerup;
+        }
+
     }
 
     public class WinMoreScissors : PowerUp
@@ -906,8 +978,8 @@ public partial class fight : Control
 
     public class PowerUp3 : PowerUp
     {
-        public override string Name { get { return "Johnny"; } }
-        public override string Description { get { return "+1 if your last hand was Paper"; } }
+        public override string Name { get { return "Combo Breaker"; } }
+        public override string Description { get { return "+3 if you switch hands after playing the same hand twice"; } }
         public override bool isActive(Player player)
         {
             return roundResults[roundResults.Count - 1].playerHands[player.playerId] == Hand.PAPER;

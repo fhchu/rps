@@ -432,6 +432,7 @@ alignment = 2
 custom_minimum_size = Vector2(0, 500)
 layout_mode = 2
 size_flags_vertical = 3
+size_flags_stretch_ratio = 5.0
 alignment = 1
 
 [node name="MarginContainer0" type="MarginContainer" parent="UpgradesCanvas/UpgradesVBox/UpgradesHBox"]
@@ -599,7 +600,6 @@ theme_override_styles/panel = ExtResource("6_7362f")
 [node name="TextboxMargin" type="MarginContainer" parent="UpgradesCanvas/UpgradesVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-size_flags_stretch_ratio = 0.2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -617,6 +617,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_font_sizes/font_size = 48
 text = "Begin"
 horizontal_alignment = 1
 vertical_alignment = 1
