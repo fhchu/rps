@@ -35,7 +35,7 @@ public partial class fight : Control
     private int upgradeSelection;
     private bool isAnimating;
 
-    private bool animationsEnabled = false;
+    private bool animationsEnabled = true;
 
     Panel gameLog;
     Control upgradesControl;
@@ -473,7 +473,7 @@ public partial class fight : Control
         TextureRect loserPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + loser + SPRITE_UI_PATH);
         Label loserLabel = loserPicture.GetChild<Label>(0);
 
-        float waitTime = 0.45f;
+        float waitTime = 0.5f;
         if (isTie)
         {
             winnerLabel.Text = "Tie";
@@ -846,39 +846,48 @@ public partial class fight : Control
         }
     } */
 
-    public class BigRock : PowerUp{
+    public class BigRock : PowerUp
+    {
         public override string Name { get { return BIGROCK_NAME; } }
-        public override string Description { get { return "Every Rock thrown in a row is worth +2 more. Rocks worth at least 5 break ties"; } }
+        public override string Description { get { return "Every Rock thrown in a row is worth +2 more. 3 or more Rocks in a row break ties"; } }
+        int rocksCounted;
+
+        // this is specifically for the tiebreaker effect
         public override bool isActive(Player player)
         {
             int ownerId = player.playerId;
             int numRounds = roundResults.Count;
-            if (numRounds >= 2)
+
+            countRocks(ownerId);
+            if (rocksCounted >= 2)
             {
-                int i = numRounds - 1;
-                int rocks = 0;
-                while (i > roundObtained && roundResults[i].playerHands[ownerId] == Hand.ROCK)
-                {
-                    i--;
-                    rocks++;
-                }
-                if ((rocks + 1) % 3 == 0)
-                {
-                    return true;
-                }
+                return true;
             }
+
             return false;
         }
         public override List<Multiplier> calculateDamage(Player player)
         {
             List<Multiplier> powerup = new List<Multiplier>();
-            if (isActive(player))
-            {
-                powerup.Add(new Multiplier(Operation.ADD, 3, Hand.ROCK));
-            }
+
+            countRocks(player.playerId);
+            powerup.Add(new Multiplier(Operation.ADD, 2 * rocksCounted, Hand.ROCK));
             return powerup;
         }
 
+        private void countRocks(int ownerId)
+        {
+            int numRounds = roundResults.Count;
+
+            int i = numRounds - 1;
+            int rocks = 0;
+            while (roundResults[i].playerHands[ownerId] == Hand.ROCK)
+            {
+                i--;
+                rocks++;
+            }
+            rocksCounted = rocks;
+        }
     }
 
     public class WinMoreScissors : PowerUp
