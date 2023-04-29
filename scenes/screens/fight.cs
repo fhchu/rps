@@ -14,10 +14,12 @@ public partial class fight : Control
     const string RPSGO_PATH = "UpgradesCanvas/RPSGoMargin/GameLog";
     const string HANDS_UI_PATH = "/HandsMargin/HandsHBox";
     const string SPRITE_UI_PATH = "/PlayerTexture";
+    const string READY_UI_PATH = "/ReadyLabel";
+
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
     // we might want to have different/separate player health someday but not right now
-    const int PLAYER_HEALTH = 20;
+    const int PLAYER_HEALTH = 25;
     const string BIGROCK_NAME = "Big Rock";
 
     public enum Hand { ROCK, PAPER, SCISSORS, NULL }
@@ -94,7 +96,12 @@ public partial class fight : Control
             }
             if (players[1].hasThrown && players[0].hasThrown && !isAnimating)
             {
+                sayReady(false, false);
                 calculateDamage();
+            }
+            else
+            {
+                sayReady(players[0].hasThrown, players[1].hasThrown);
             }
         }
         else if (isUpgradePhase)
@@ -188,15 +195,16 @@ public partial class fight : Control
             List<int> expLevels = new List<int>() { 5, 8, 13 };
 
             List<PowerUp> powerUpLibrary = new List<PowerUp>();
+
             powerUpLibrary.Add(new TieBonus());
             powerUpLibrary.Add(new ChangeBonus());
             powerUpLibrary.Add(new InARow());
             powerUpLibrary.Add(new BigRock());
             powerUpLibrary.Add(new WinMoreScissors());
             powerUpLibrary.Add(new PaperSwap());
-            powerUpLibrary.Add(new PowerUp1());
-            powerUpLibrary.Add(new PowerUp2());
-            powerUpLibrary.Add(new PowerUp3());
+            powerUpLibrary.Add(new mimicHand());
+            powerUpLibrary.Add(new exodia());
+            powerUpLibrary.Add(new thirdSwitch());
 
             Player player = new Player(i, PLAYER_NODE_PATH + i, expLevels, powerUpLibrary);
 
@@ -370,6 +378,26 @@ public partial class fight : Control
         isAnimating = false;
     }
 
+    private void sayReady(bool player0Ready, bool player1Ready)
+    {
+
+        Label player0label = GetNode<Label>(PLAYER_NODE_PATH + 0 + SPRITE_UI_PATH + READY_UI_PATH);
+        Label player1label = GetNode<Label>(PLAYER_NODE_PATH + 1 + SPRITE_UI_PATH + READY_UI_PATH);
+
+        player0label.Hide();
+        player1label.Hide();
+
+        if (player0Ready)
+        {
+            player0label.Show();
+
+        }
+        if (player1Ready)
+        {
+            player1label.Show();
+
+        }
+    }
     //calculate winner and apply damage
     private async void calculateDamage()
     {
@@ -591,7 +619,7 @@ public partial class fight : Control
     private void endGame(Player loser)
     {
         gameLogDisplay("Game Over!");
-        TextureRect loserPic = GetNode<TextureRect>(PLAYER_NODE_PATH + loser + SPRITE_UI_PATH);
+        TextureRect loserPic = GetNode<TextureRect>(PLAYER_NODE_PATH + loser.playerId + SPRITE_UI_PATH);
         var sadPicture = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
         loserPic.Texture = sadPicture;
         loserPic.FlipV = true;
@@ -709,6 +737,8 @@ public partial class fight : Control
 
         public abstract string Name { get; }
         public abstract string Description { get; }
+        public abstract int RoundObtained { set; }
+
         //tells the backend/UI whether to list this powerup as active
         public abstract bool isActive(Player player);
         //calculate the damage this powerup provides to the player owning it
@@ -719,6 +749,8 @@ public partial class fight : Control
     {
         public override string Name { get { return "Streak Bonus"; } }
         public override string Description { get { return "+1 for each same hand you throw in a row"; } }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
         public override bool isActive(Player player)
         {
             return true;
@@ -749,6 +781,8 @@ public partial class fight : Control
     {
         public override string Name { get { return "Unpredictable"; } }
         public override string Description { get { return "+1 if you throw a different hand than before"; } }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
         public override bool isActive(Player player)
         {
             return true;
@@ -776,6 +810,8 @@ public partial class fight : Control
     {
         public override string Name { get { return "Silver Lining"; } }
         public override string Description { get { return "+1 to all Hands for each Tie in a row before you Win"; } }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
         public override bool isActive(Player player)
         {
             return roundResults[roundResults.Count - 1].winner == -1;
@@ -850,7 +886,9 @@ public partial class fight : Control
     {
         public override string Name { get { return BIGROCK_NAME; } }
         public override string Description { get { return "Every Rock thrown in a row is worth +2 more. 3 or more Rocks in a row break ties"; } }
-        int rocksCounted;
+        private int rocksCounted;
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
 
         // this is specifically for the tiebreaker effect
         public override bool isActive(Player player)
@@ -892,14 +930,10 @@ public partial class fight : Control
 
     public class WinMoreScissors : PowerUp
     {
-        public int roundObtained;
         public override string Name { get { return "When it Glides"; } }
         public override string Description { get { return "+2 to Scissors permanently every time you Win with Scissors"; } }
-
-        public WinMoreScissors()
-        {
-            roundObtained = 0;
-        }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
 
         public override bool isActive(Player player)
         {
@@ -926,6 +960,8 @@ public partial class fight : Control
     {
         public override string Name { get { return "Origami"; } }
         public override string Description { get { return "+2 to all Hands if your last hand was Paper"; } }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
         public override bool isActive(Player player)
         {
             return roundResults[roundResults.Count - 1].playerHands[player.playerId] == Hand.PAPER;
@@ -943,64 +979,115 @@ public partial class fight : Control
         }
     }
 
-    public class PowerUp1 : PowerUp
+    public class mimicHand : PowerUp
     {
-        public override string Name { get { return "Timmy"; } }
-        public override string Description { get { return "+1 if your last hand was Paper"; } }
+        public override string Name { get { return "Copycat"; } }
+        public override string Description { get { return "+2 to the Hand your opponent last played"; } }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
         public override bool isActive(Player player)
         {
-            return roundResults[roundResults.Count - 1].playerHands[player.playerId] == Hand.PAPER;
+            return true;
         }
         public override List<Multiplier> calculateDamage(Player player)
         {
             List<Multiplier> multipliers = new List<Multiplier>();
             if (isActive(player))
             {
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.ROCK));
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.PAPER));
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.SCISSORS));
+                Hand lastHand = roundResults[roundResults.Count - 1].playerHands[1 - player.playerId];
+                multipliers.Add(new Multiplier(Operation.ADD, 2, lastHand));
+
             }
             return multipliers;
         }
     }
 
-    public class PowerUp2 : PowerUp
+    public class exodia : PowerUp
     {
-        public override string Name { get { return "Spike"; } }
+        public override string Name { get { return "Out of Hand"; } }
         public override string Description { get { return "+3 to all Hands if your last 3 hands are unique"; } }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
         public override bool isActive(Player player)
         {
-            return roundResults[roundResults.Count - 1].playerHands[player.playerId] == Hand.PAPER;
+            int numRounds = roundResults.Count;
+            if (numRounds >= 3)
+            {
+                int[] hands = new int[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    hands[(int)roundResults[numRounds - i - 1].playerHands[player.playerId]]++;
+                }
+                for (int i = 0; i < 3; i++)
+                {
+                    if (hands[i] != 1)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
         public override List<Multiplier> calculateDamage(Player player)
         {
             List<Multiplier> multipliers = new List<Multiplier>();
             if (isActive(player))
             {
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.ROCK));
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.PAPER));
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.SCISSORS));
+                if (isActive(player))
+                {
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.ROCK));
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.PAPER));
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.SCISSORS));
+                }
+
             }
             return multipliers;
         }
     }
 
-    public class PowerUp3 : PowerUp
+    public class thirdSwitch : PowerUp
     {
         public override string Name { get { return "Combo Breaker"; } }
         public override string Description { get { return "+3 if you switch hands after playing the same hand twice"; } }
+        private int roundObtained;
+        public override int RoundObtained { set { roundObtained = value; } }
         public override bool isActive(Player player)
         {
-            return roundResults[roundResults.Count - 1].playerHands[player.playerId] == Hand.PAPER;
+            int numRounds = roundResults.Count;
+            if (numRounds >= 2)
+            {
+                int playerId = player.playerId;
+                Hand lastHand = roundResults[numRounds - 1].playerHands[playerId];
+                Hand lastLasthand = roundResults[numRounds - 2].playerHands[playerId];
+                if (lastHand == lastLasthand)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         public override List<Multiplier> calculateDamage(Player player)
         {
             List<Multiplier> multipliers = new List<Multiplier>();
             if (isActive(player))
             {
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.ROCK));
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.PAPER));
-                multipliers.Add(new Multiplier(Operation.ADD, 1, Hand.SCISSORS));
+                Hand lastHand = roundResults[roundResults.Count - 1].playerHands[player.playerId];
+                if (lastHand == Hand.ROCK)
+                {
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.PAPER));
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.SCISSORS));
+                }
+                if (lastHand == Hand.PAPER)
+                {
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.ROCK));
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.SCISSORS));
+                }
+                if (lastHand == Hand.SCISSORS)
+                {
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.ROCK));
+                    multipliers.Add(new Multiplier(Operation.ADD, 3, Hand.PAPER));
+                }
             }
             return multipliers;
         }
