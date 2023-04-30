@@ -459,10 +459,10 @@ public partial class fight : Control
             {
                 // if the loser upgrade phase didn't start, we try the winner upgrade phase now. 
                 // otherwise it will check after the loser upgrade phase completes.
-                bool didUpgrade = updateExp(loserPlayer, loserPlayer.currentExp + damage + baseExp, true);
-                didUpgrade = didUpgrade || updateExp(winnerPlayer, winnerPlayer.currentExp + baseExp, didUpgrade);
+                bool didLoserUpgrade = updateExp(loserPlayer, loserPlayer.currentExp + damage + baseExp, true);
+                bool didWinnerUpgrade = updateExp(winnerPlayer, winnerPlayer.currentExp + baseExp, !didLoserUpgrade);
 
-                if (!didUpgrade)
+                if (!didLoserUpgrade && !didWinnerUpgrade)
                 {
                     enableCombat();
                 }
