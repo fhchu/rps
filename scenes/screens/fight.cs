@@ -39,6 +39,7 @@ public partial class fight : Control
     private bool isAnimating;
 
     private bool animationsEnabled = true;
+    private bool isPaused = false;
 
     Panel gameLog;
     Control upgradesControl;
@@ -63,7 +64,11 @@ public partial class fight : Control
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
-        if (isCombatEnabled)
+        if (Input.IsActionJustPressed("menu"))
+        {
+            displayMenu();
+        }
+        else if (isCombatEnabled)
         {
             if (Input.IsActionJustPressed("rock0"))
             {
@@ -351,7 +356,23 @@ public partial class fight : Control
         //TODO make this green or red if it's bigger/smaller
     }
 
+    public void _on_pause_button_pressed()
+    {
+        GetTree().Paused = true;
+        //GetNode<Control>("pause_popup").Show();
+    }
 
+    public void _on_pause_popup_close_pressed()
+    {
+        //GetNode<Control>("pause_popup").Hide();
+        GetTree().Paused = false;
+    }
+
+    private void displayMenu()
+    {
+        isPaused = !isPaused;
+        GetTree().Paused = isPaused;
+    }
 
     // activate combat polling for input and play RPSGO animation
     private void enableCombat()
@@ -504,7 +525,7 @@ public partial class fight : Control
         Label loserLabel = loserPicture.GetChild<Label>(0);
         TextureRect loserHand = loserPicture.GetNode<TextureRect>(HAND_SPRITE);
 
-        float waitTime = 0.6f;
+        float waitTime = 1.0f;
         var happySprite = GD.Load<Texture2D>("res://assets/player sprites/catHappy.png");
         var defaultSprite = GD.Load<Texture2D>("res://assets/player sprites/catDefault.png");
         var sadSprite = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
@@ -552,7 +573,6 @@ public partial class fight : Control
         }
 
         return GD.Load<Texture2D>("res://assets/player sprites/scissors.png");
-
     }
 
     // show the upgrade UI. does not handle upgrade logic
@@ -644,7 +664,9 @@ public partial class fight : Control
     // when one player has 0 hp, the game is over
     private void endGame(Player loser)
     {
-        gameLogDisplay("Game Over!");
+        Label label = refereePanel.GetNode<Label>("Label");
+        label.Text = "Game Over!    ";
+        refereePanel.Show();
         TextureRect loserPic = GetNode<TextureRect>(PLAYER_NODE_PATH + loser.playerId + SPRITE_UI_PATH);
         var sadPicture = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
         loserPic.Texture = sadPicture;
