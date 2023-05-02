@@ -1,10 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://bhgnrtnha444s"]
+[gd_scene load_steps=16 format=3 uid="uid://bhgnrtnha444s"]
 
 [ext_resource type="Texture2D" uid="uid://bep1015jkmd0" path="res://assets/player sprites/cat.png" id="1_6l72s"]
 [ext_resource type="Script" path="res://scenes/screens/fight.cs" id="1_8ieqv"]
 [ext_resource type="Theme" uid="uid://gefladbfxnyk" path="res://theme.tres" id="1_xkxst"]
 [ext_resource type="StyleBox" uid="uid://bmam0s5q1d48v" path="res://assets/styleboxes/player0StyleBoxFlat.tres" id="3_clw57"]
 [ext_resource type="StyleBox" uid="uid://dskqyxivmtx3h" path="res://assets/styleboxes/emptybarstyleboxflat.tres" id="4_0yy24"]
+[ext_resource type="Texture2D" uid="uid://ho756x0tve8f" path="res://assets/player sprites/rock.png" id="6_2ked8"]
 [ext_resource type="StyleBox" uid="uid://b00nx4uvgo4mo" path="res://assets/styleboxes/outlineStyleBoxFLat.tres" id="6_7362f"]
 [ext_resource type="Script" path="res://scenes/screens/TextBox.cs" id="6_ldefa"]
 [ext_resource type="StyleBox" uid="uid://dpqrp8hjb3jlg" path="res://assets/styleboxes/redstyleboxflat.tres" id="7_2wmkj"]
@@ -187,6 +188,21 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "Ready!"
 horizontal_alignment = 1
+
+[node name="HandTexture" type="TextureRect" parent="LocalHBox/PlayerVBox0/PlayerTexture"]
+visible = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -200.0
+offset_bottom = 200.0
+grow_horizontal = 0
+grow_vertical = 2
+texture = ExtResource("6_2ked8")
 
 [node name="HandsMargin" type="MarginContainer" parent="LocalHBox/PlayerVBox0"]
 layout_mode = 2
@@ -376,6 +392,18 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "Ready!"
 horizontal_alignment = 1
+
+[node name="HandTexture" type="TextureRect" parent="LocalHBox/PlayerVBox1/PlayerTexture"]
+visible = false
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -200.0
+offset_right = 400.0
+offset_bottom = 200.0
+grow_vertical = 2
+texture = ExtResource("6_2ked8")
 
 [node name="HandsMargin" type="MarginContainer" parent="LocalHBox/PlayerVBox1"]
 layout_mode = 2
