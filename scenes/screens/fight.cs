@@ -15,6 +15,7 @@ public partial class fight : Control
     const string HANDS_UI_PATH = "/HandsMargin/HandsHBox";
     const string SPRITE_UI_PATH = "/PlayerTexture";
     const string READY_UI_PATH = "/ReadyLabel";
+    const string HAND_SPRITE = "HandTexture";
 
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
@@ -96,12 +97,12 @@ public partial class fight : Control
             }
             if (players[1].hasThrown && players[0].hasThrown && !isAnimating)
             {
-                sayReady(false, false);
+                displayReady(false, false);
                 calculateDamage();
             }
             else
             {
-                sayReady(players[0].hasThrown, players[1].hasThrown);
+                displayReady(players[0].hasThrown, players[1].hasThrown);
             }
         }
         else if (isUpgradePhase)
@@ -378,7 +379,7 @@ public partial class fight : Control
         isAnimating = false;
     }
 
-    private void sayReady(bool player0Ready, bool player1Ready)
+    private void displayReady(bool player0Ready, bool player1Ready)
     {
 
         Label player0label = GetNode<Label>(PLAYER_NODE_PATH + 0 + SPRITE_UI_PATH + READY_UI_PATH);
@@ -445,7 +446,7 @@ public partial class fight : Control
             winnerPlayer = player1;
             loserPlayer = player0;
         }
-        await sayRoundWinner(winner);
+        await displayRoundWinner(winner);
         int baseExp = 1;
         if (winner != -1)
         {
@@ -482,7 +483,7 @@ public partial class fight : Control
     }
 
     // explain who won the last round
-    private async Task sayRoundWinner(int winner)
+    private async Task displayRoundWinner(int winner)
     {
         if (!animationsEnabled)
         {
@@ -497,36 +498,61 @@ public partial class fight : Control
         int loser = 1 - winner;
         TextureRect winnerPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + winner + SPRITE_UI_PATH);
         Label winnerLabel = winnerPicture.GetChild<Label>(0);
+        TextureRect winnerHand = winnerPicture.GetNode<TextureRect>(HAND_SPRITE);
 
         TextureRect loserPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + loser + SPRITE_UI_PATH);
         Label loserLabel = loserPicture.GetChild<Label>(0);
+        TextureRect loserHand = loserPicture.GetNode<TextureRect>(HAND_SPRITE);
 
-        float waitTime = 0.5f;
+        float waitTime = 0.6f;
+        var happySprite = GD.Load<Texture2D>("res://assets/player sprites/catHappy.png");
+        var defaultSprite = GD.Load<Texture2D>("res://assets/player sprites/catDefault.png");
+        var sadSprite = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
+
+        winnerHand.Texture = getHandSprite(players[winner].thrownHand);
+        loserHand.Texture = getHandSprite(players[loser].thrownHand);
+
+        winnerHand.Show();
+        loserHand.Show();
         if (isTie)
         {
             winnerLabel.Text = "Tie";
             loserLabel.Text = "Tie";
             winnerLabel.Show();
             loserLabel.Show();
-            await ToSignal(GetTree().CreateTimer(waitTime), SceneTreeTimer.SignalName.Timeout);
-            winnerLabel.Hide();
-            loserLabel.Hide();
         }
         else
         {
-            var happyPicture = GD.Load<Texture2D>("res://assets/player sprites/catHappy.png");
-            var defaultPicture = GD.Load<Texture2D>("res://assets/player sprites/catDefault.png");
-            var sadPicture = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
-
-            winnerPicture.Texture = happyPicture;
-            loserPicture.Texture = sadPicture;
+            winnerPicture.Texture = happySprite;
+            loserPicture.Texture = sadSprite;
             winnerLabel.Text = "Win!";
             winnerLabel.Show();
-            await ToSignal(GetTree().CreateTimer(waitTime), SceneTreeTimer.SignalName.Timeout);
-            winnerLabel.Hide();
-            winnerPicture.Texture = defaultPicture;
-            loserPicture.Texture = defaultPicture;
+
         }
+        await ToSignal(GetTree().CreateTimer(waitTime), SceneTreeTimer.SignalName.Timeout);
+        winnerLabel.Hide();
+        loserLabel.Hide();
+        winnerHand.Hide();
+        loserHand.Hide();
+        winnerPicture.Texture = defaultSprite;
+        loserPicture.Texture = defaultSprite;
+    }
+
+    Texture2D getHandSprite(Hand hand)
+    {
+        if (hand == Hand.ROCK)
+        {
+            return GD.Load<Texture2D>("res://assets/player sprites/rock.png");
+
+        }
+        if (hand == Hand.PAPER)
+        {
+            return GD.Load<Texture2D>("res://assets/player sprites/paper.png");
+
+        }
+
+        return GD.Load<Texture2D>("res://assets/player sprites/scissors.png");
+
     }
 
     // show the upgrade UI. does not handle upgrade logic
