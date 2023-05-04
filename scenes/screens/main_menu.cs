@@ -4,7 +4,7 @@ using System;
 public partial class main_menu : MarginContainer
 {
     //total number of rows in the menu. need to update this whenever a new option is added
-    private int menuRowCount = 2;
+    private int menuRowCount = 1;
     private int startRow = 0;
     private int exitRow = 2;
     private Label selector1;

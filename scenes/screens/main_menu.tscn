@@ -51,9 +51,10 @@ text = ">"
 [node name="StartLabel" type="Label" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox/StartHBox"]
 layout_mode = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 84
-text = "Throw hands!
-"
+theme_override_font_sizes/font_size = 64
+text = "ASD for player 1. 
+Arrow keys for Player 2.
+Press Enter to Start!"
 
 [node name="OptionsHBox" type="HBoxContainer" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox"]
 visible = false

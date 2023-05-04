@@ -11,21 +11,23 @@ public partial class fight : Control
     const string EXP_BAR_PATH = "/HealthBarMargin/BarVBox/ExpBar";
     const string GAMELOG_PATH = "UpgradesCanvas/UpgradesVBox/TextboxMargin/GameLog";
     const string UPGRADES_PATH = "UpgradesCanvas/UpgradesVBox/UpgradesHBox";
-    const string RPSGO_PATH = "UpgradesCanvas/RPSGoMargin/GameLog";
+    const string RPSGO_PATH = "UpgradesCanvas/RPSGoMargin/HBoxContainer/GameLog";
     const string HANDS_UI_PATH = "/HandsMargin/HandsHBox";
-    const string SPRITE_UI_PATH = "/PlayerTexture";
+    const string PLAYER_MARGIN = "/PlayerMargin";
+    const string SPRITE_UI_PATH = "PlayerTexture";
     const string READY_UI_PATH = "/ReadyLabel";
     const string HAND_SPRITE = "HandTexture";
 
     const int NUM_PLAYERS = 2;
     const int NUM_HANDS = 3;
     // we might want to have different/separate player health someday but not right now
-    const int PLAYER_HEALTH = 25;
+    const int PLAYER_HEALTH = 20;
     const string BIGROCK_NAME = "Big Rock";
 
     public enum Hand { ROCK, PAPER, SCISSORS, NULL }
     public enum Operation { ADD, MULTIPLY, DIVIDE }
-
+    //todo use this instead of the different bools below
+    public enum GameState { COMBAT, ANIMATING, UPGRADING, FINISHED }
     private Player[] players;
     private static List<RoundResult> roundResults;
     // this is an array because we might want more phases in the future
@@ -37,7 +39,7 @@ public partial class fight : Control
     private int upgradingPlayer;
     private int upgradeSelection;
     private bool isAnimating;
-
+    private bool isGameOver = true;
     private bool animationsEnabled = true;
 
     Panel gameLog;
@@ -182,6 +184,13 @@ public partial class fight : Control
             }
             displayUpgradeOutline();
         }
+        else if (isGameOver)
+        {
+            if (Input.IsActionJustPressed("ui_accept"))
+            {
+                _Ready();
+            }
+        }
     }
 
     // build players before game starts.
@@ -203,8 +212,8 @@ public partial class fight : Control
             powerUpLibrary.Add(new BigRock());
             powerUpLibrary.Add(new WinMoreScissors());
             powerUpLibrary.Add(new PaperSwap());
-            powerUpLibrary.Add(new mimicHand());
-            powerUpLibrary.Add(new exodia());
+            powerUpLibrary.Add(new MimicHand());
+            powerUpLibrary.Add(new Exodia());
             powerUpLibrary.Add(new thirdSwitch());
 
             Player player = new Player(i, PLAYER_NODE_PATH + i, expLevels, powerUpLibrary);
@@ -212,6 +221,10 @@ public partial class fight : Control
             players[i] = player;
             // player does not handle setting of their own powers
             setAllHands(player, 1, 1, 1);
+            TextureRect pic = GetNode<TextureRect>(PLAYER_NODE_PATH + i + PLAYER_MARGIN + "/" + SPRITE_UI_PATH);
+            var defaultPicture = GD.Load<Texture2D>("res://assets/player sprites/catDefault.png");
+            pic.Texture = defaultPicture;
+            pic.FlipV = false;
         }
     }
 
@@ -232,6 +245,7 @@ public partial class fight : Control
     // sets up fighting once upgrades have been taken
     private void startGame(int gameHealth)
     {
+        isGameOver = false;
         //currentPhase += 1;
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
@@ -382,8 +396,8 @@ public partial class fight : Control
     private void displayReady(bool player0Ready, bool player1Ready)
     {
 
-        Label player0label = GetNode<Label>(PLAYER_NODE_PATH + 0 + SPRITE_UI_PATH + READY_UI_PATH);
-        Label player1label = GetNode<Label>(PLAYER_NODE_PATH + 1 + SPRITE_UI_PATH + READY_UI_PATH);
+        Label player0label = GetNode<Label>(PLAYER_NODE_PATH + 0 + PLAYER_MARGIN + READY_UI_PATH);
+        Label player1label = GetNode<Label>(PLAYER_NODE_PATH + 1 + PLAYER_MARGIN + READY_UI_PATH);
 
         player0label.Hide();
         player1label.Hide();
@@ -496,15 +510,17 @@ public partial class fight : Control
             winner = 0;
         }
         int loser = 1 - winner;
-        TextureRect winnerPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + winner + SPRITE_UI_PATH);
-        Label winnerLabel = winnerPicture.GetChild<Label>(0);
+        Control winnerControl = GetNode<Control>(PLAYER_NODE_PATH + winner + PLAYER_MARGIN);
+        Label winnerLabel = winnerControl.GetNode<Label>("WinLabel");
+        TextureRect winnerPicture = winnerControl.GetNode<TextureRect>(SPRITE_UI_PATH);
         TextureRect winnerHand = winnerPicture.GetNode<TextureRect>(HAND_SPRITE);
 
-        TextureRect loserPicture = GetNode<TextureRect>(PLAYER_NODE_PATH + loser + SPRITE_UI_PATH);
-        Label loserLabel = loserPicture.GetChild<Label>(0);
+        Control loserControl = GetNode<Control>(PLAYER_NODE_PATH + loser + PLAYER_MARGIN);
+        Label loserLabel = loserControl.GetNode<Label>("WinLabel");
+        TextureRect loserPicture = loserControl.GetNode<TextureRect>(SPRITE_UI_PATH);
         TextureRect loserHand = loserPicture.GetNode<TextureRect>(HAND_SPRITE);
 
-        float waitTime = 0.6f;
+        float waitTime = 0.8f;
         var happySprite = GD.Load<Texture2D>("res://assets/player sprites/catHappy.png");
         var defaultSprite = GD.Load<Texture2D>("res://assets/player sprites/catDefault.png");
         var sadSprite = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
@@ -644,12 +660,15 @@ public partial class fight : Control
     // when one player has 0 hp, the game is over
     private void endGame(Player loser)
     {
-        gameLogDisplay("Game Over!");
-        TextureRect loserPic = GetNode<TextureRect>(PLAYER_NODE_PATH + loser.playerId + SPRITE_UI_PATH);
+        Label label = refereePanel.GetNode<Label>("Label");
+        label.Text = "Game Over!\nEnter to Restart";
+        refereePanel.Show();
+        TextureRect loserPic = GetNode<TextureRect>(PLAYER_NODE_PATH + loser.playerId + PLAYER_MARGIN + "/" + SPRITE_UI_PATH);
         var sadPicture = GD.Load<Texture2D>("res://assets/player sprites/catSad.png");
         loserPic.Texture = sadPicture;
         loserPic.FlipV = true;
         isCombatEnabled = false;
+        isGameOver = true;
     }
 
     // display text on the thing on the
@@ -945,7 +964,7 @@ public partial class fight : Control
 
             int i = numRounds - 1;
             int rocks = 0;
-            while (roundResults[i].playerHands[ownerId] == Hand.ROCK)
+            while (i >= roundObtained && roundResults[i].playerHands[ownerId] == Hand.ROCK)
             {
                 i--;
                 rocks++;
@@ -1005,7 +1024,7 @@ public partial class fight : Control
         }
     }
 
-    public class mimicHand : PowerUp
+    public class MimicHand : PowerUp
     {
         public override string Name { get { return "Copycat"; } }
         public override string Description { get { return "+2 to the Hand your opponent last played"; } }
@@ -1028,7 +1047,7 @@ public partial class fight : Control
         }
     }
 
-    public class exodia : PowerUp
+    public class Exodia : PowerUp
     {
         public override string Name { get { return "Out of Hand"; } }
         public override string Description { get { return "+3 to all Hands if your last 3 hands are unique"; } }
