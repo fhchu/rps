@@ -1,7 +1,8 @@
-[gd_resource type="Theme" load_steps=4 format=3 uid="uid://gefladbfxnyk"]
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://gefladbfxnyk"]
 
 [ext_resource type="StyleBox" uid="uid://bmam0s5q1d48v" path="res://assets/styleboxes/player0StyleBoxFlat.tres" id="1_5767j"]
 [ext_resource type="StyleBox" uid="uid://dx65m1812fflx" path="res://assets/styleboxes/player1Styleboxflat.tres" id="2_5dxy8"]
+[ext_resource type="StyleBox" uid="uid://dskqyxivmtx3h" path="res://assets/styleboxes/emptybarstyleboxflat.tres" id="3_10xi3"]
 [ext_resource type="FontFile" uid="uid://crdmspg2bqluo" path="res://assets/Roboto-Regular.ttf" id="3_q2q5s"]
 
 [resource]
@@ -9,4 +10,4 @@ default_font = ExtResource("3_q2q5s")
 default_font_size = 48
 /styles/player0stylebox = ExtResource("1_5767j")
 /styles/player1stylebox = ExtResource("2_5dxy8")
-Panel/styles/panel = ExtResource("1_5767j")
+Panel/styles/panel = ExtResource("3_10xi3")
