@@ -56,7 +56,7 @@ public partial class main_menu : MarginContainer
     {
         if (updatedCursor == startRow)
         {
-            PackedScene fightScene = (PackedScene)ResourceLoader.Load("res://scenes/screens/fight.tscn");
+            PackedScene fightScene = (PackedScene)ResourceLoader.Load("res://scenes/screens/charselect.tscn");
             GetParent().AddChild(fightScene.Instantiate());
             QueueFree();
         }

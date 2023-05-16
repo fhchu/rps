@@ -69,7 +69,6 @@ theme_override_constants/separation = 0
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 30
 theme_override_constants/margin_right = 30
 theme_override_constants/margin_bottom = 0
 
@@ -106,7 +105,7 @@ size_flags_vertical = 3
 [node name="HealthBar" type="ProgressBar" parent="LocalHBox/PlayerVBox0/HealthBarMargin/HBoxContainer/BarVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-size_flags_stretch_ratio = 2.0
+size_flags_stretch_ratio = 1.8
 theme_override_styles/background = ExtResource("4_0yy24")
 theme_override_styles/fill = SubResource("StyleBoxFlat_npn0w")
 max_value = 3.0
@@ -431,6 +430,7 @@ theme_override_constants/margin_bottom = 20
 
 [node name="HandsHBox" type="HBoxContainer" parent="LocalHBox/PlayerVBox0/HandsMargin"]
 layout_mode = 2
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="Control" type="Control" parent="LocalHBox/PlayerVBox0/HandsMargin/HandsHBox"]
@@ -557,8 +557,6 @@ theme_override_constants/separation = 0
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_bottom = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="LocalHBox/PlayerVBox1/HealthBarMargin"]
 layout_mode = 2
@@ -575,7 +573,7 @@ size_flags_vertical = 3
 [node name="HealthBar" type="ProgressBar" parent="LocalHBox/PlayerVBox1/HealthBarMargin/HBoxContainer/BarVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-size_flags_stretch_ratio = 2.0
+size_flags_stretch_ratio = 1.8
 theme_override_styles/background = ExtResource("4_0yy24")
 theme_override_styles/fill = SubResource("StyleBoxFlat_npn0w")
 max_value = 3.0
@@ -592,7 +590,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 32
 text = " 2/3 "
 vertical_alignment = 1
 
@@ -603,7 +601,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "Player 2 "
 horizontal_alignment = 2
 vertical_alignment = 1
@@ -633,7 +631,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 32
-text = "2/3 "
+text = " 2/3 "
 vertical_alignment = 1
 
 [node name="Control" type="Control" parent="LocalHBox/PlayerVBox1/HealthBarMargin/HBoxContainer/BarVBox/HBoxContainer"]
@@ -649,8 +647,8 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.2
-theme_override_font_sizes/font_size = 26
-text = "Robin"
+theme_override_font_sizes/font_size = 32
+text = "Robin "
 horizontal_alignment = 2
 vertical_alignment = 2
 
@@ -670,7 +668,6 @@ size_flags_horizontal = 3
 texture = ExtResource("4_gvy6w")
 expand_mode = 1
 stretch_mode = 4
-flip_h = true
 
 [node name="PlayerMargin" type="MarginContainer" parent="LocalHBox/PlayerVBox1"]
 layout_mode = 2
@@ -904,6 +901,7 @@ theme_override_constants/margin_bottom = 20
 
 [node name="HandsHBox" type="HBoxContainer" parent="LocalHBox/PlayerVBox1/HandsMargin"]
 layout_mode = 2
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="Control" type="Control" parent="LocalHBox/PlayerVBox1/HandsMargin/HandsHBox"]
