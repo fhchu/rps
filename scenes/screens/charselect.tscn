@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://rwi048pc52ah"]
+[gd_scene load_steps=9 format=3 uid="uid://dmuu4fr48pe5q"]
 
 [ext_resource type="Theme" uid="uid://gefladbfxnyk" path="res://theme.tres" id="1_3ulon"]
 [ext_resource type="Script" path="res://scenes/screens/charselect.cs" id="2_dewx4"]
@@ -6,9 +6,8 @@
 [ext_resource type="StyleBox" uid="uid://bhdg6flkyobmv" path="res://scenes/screens/powerupStylebox.tres" id="4_l636c"]
 [ext_resource type="Texture2D" uid="uid://b7fcikjxiri5q" path="res://assets/player sprites/dogDefault.png" id="5_hkgqy"]
 [ext_resource type="Theme" uid="uid://clrsmbhwe8hiv" path="res://scenes/screens/p1redfonttheme.tres" id="5_jt410"]
-[ext_resource type="Texture2D" uid="uid://nh3viqb7ypf4" path="res://assets/player sprites/catSplash.png" id="6_hteqw"]
-[ext_resource type="Texture2D" uid="uid://u7gc2osnfgp6" path="res://assets/player sprites/paper.png" id="7_a6100"]
-[ext_resource type="Texture2D" uid="uid://ho756x0tve8f" path="res://assets/player sprites/rock.png" id="7_cl51p"]
+[ext_resource type="Texture2D" uid="uid://c6205yahj1udw" path="res://assets/player sprites/catDefault.png" id="7_vwuto"]
+[ext_resource type="Texture2D" uid="uid://dib2ppoo6m5ig" path="res://assets/player sprites/bunnyDefault.png" id="8_hu74n"]
 
 [node name="Control" type="ColorRect"]
 anchors_preset = 15
@@ -20,7 +19,7 @@ theme = ExtResource("1_3ulon")
 color = Color(0.0313726, 0.0862745, 0.219608, 1)
 script = ExtResource("2_dewx4")
 
-[node name="VBoxContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,21 +27,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="Player1VBox" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer/VBoxContainer2"]
+[node name="Control" type="Control" parent="MarginContainer/HBoxContainer/Player1VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainer2/Control"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer/Player1VBox/Control"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -54,17 +53,13 @@ expand_mode = 1
 stretch_mode = 5
 flip_h = true
 
-[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer2/Control"]
+[node name="NameLabel" type="Label" parent="MarginContainer/HBoxContainer/Player1VBox/Control"]
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -122.0
-offset_top = -60.0
-grow_horizontal = 0
-grow_vertical = 0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.909804, 0.94902, 0, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_constants/shadow_offset_x = 4
@@ -74,9 +69,27 @@ theme_override_constants/shadow_outline_size = 5
 theme_override_font_sizes/font_size = 128
 text = "Robin "
 horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ReadyLabel" type="Label" parent="MarginContainer/HBoxContainer/Player1VBox/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.909804, 0.94902, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = -2
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 5
+theme_override_font_sizes/font_size = 128
+text = "READY!"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer2"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/Player1VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 20
@@ -84,18 +97,18 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer2/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/Player1VBox/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="Panel3" type="Panel" parent="VBoxContainer/HBoxContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
+[node name="TitlePanel" type="Panel" parent="MarginContainer/HBoxContainer/Player1VBox/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.5
 theme_override_styles/panel = ExtResource("4_l636c")
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer2/MarginContainer/VBoxContainer/Panel3"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Player1VBox/MarginContainer/VBoxContainer/TitlePanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -107,12 +120,12 @@ text = "Powerup"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Panel" type="Panel" parent="VBoxContainer/HBoxContainer/VBoxContainer2/MarginContainer/VBoxContainer"]
+[node name="DescriptionPanel" type="Panel" parent="MarginContainer/HBoxContainer/Player1VBox/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = ExtResource("4_l636c")
 
-[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer2/MarginContainer/VBoxContainer/Panel"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Player1VBox/MarginContainer/VBoxContainer/DescriptionPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -125,15 +138,15 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Panel" type="Control" parent="VBoxContainer/HBoxContainer/MarginContainer"]
+[node name="Panel" type="Control" parent="MarginContainer/HBoxContainer/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -143,7 +156,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.15
@@ -152,26 +165,22 @@ text = "PLAYER SELECT"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="GridContainer" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer"]
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 8.0
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Panel2" type="Panel" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer"]
+[node name="Panel0" type="Panel" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer"]
 custom_minimum_size = Vector2(262, 262)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = ExtResource("4_l636c")
 
-[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer/Panel2"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer/Panel0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -182,7 +191,8 @@ texture = ExtResource("5_hkgqy")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Player1Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer/Panel2"]
+[node name="Player1Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer/Panel0"]
+z_index = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -192,11 +202,12 @@ grow_vertical = 2
 theme = ExtResource("5_jt410")
 theme_override_colors/font_outline_color = Color(0.768627, 0, 0, 1)
 theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "Player 1"
 horizontal_alignment = 1
 
-[node name="Player2Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer/Panel2"]
+[node name="Player2Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer/Panel0"]
+z_index = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -204,151 +215,138 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0.956863, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 32
 text = "Player2"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Panel2" type="Panel" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer2"]
+[node name="Panel1" type="Panel" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer"]
 custom_minimum_size = Vector2(262, 262)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = ExtResource("4_l636c")
 
-[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer2/Panel2"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer/Panel1"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("7_cl51p")
+texture = ExtResource("7_vwuto")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Player1Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer2/Panel2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("5_jt410")
-theme_override_colors/font_outline_color = Color(0.768627, 0, 0, 1)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 24
-text = "Player 1"
-horizontal_alignment = 1
-
-[node name="Player2Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer2/Panel2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0.956863, 1)
-theme_override_font_sizes/font_size = 24
-text = "Player2"
-horizontal_alignment = 1
-vertical_alignment = 2
-
-[node name="CenterContainer3" type="CenterContainer" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Panel3" type="Panel" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer3"]
+[node name="Panel2" type="Panel" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer"]
 custom_minimum_size = Vector2(262, 262)
 layout_mode = 2
 theme_override_styles/panel = ExtResource("4_l636c")
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer3/Panel3"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/GridContainer/Panel2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("7_a6100")
+texture = ExtResource("8_hu74n")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Player1Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer3/Panel3"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("5_jt410")
-theme_override_colors/font_outline_color = Color(0.768627, 0, 0, 1)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 24
-text = "Player 1"
-horizontal_alignment = 1
-
-[node name="Player2Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/Panel/VBoxContainer/CenterContainer/VBoxContainer/CenterContainer3/Panel3"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0.956863, 1)
-theme_override_font_sizes/font_size = 24
-text = "Player2"
-horizontal_alignment = 1
-vertical_alignment = 2
-
-[node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="Player2VBox" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 0
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/MarginContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer3"]
+[node name="Control" type="Control" parent="MarginContainer/HBoxContainer/Player2VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="TextureRect2" type="TextureRect" parent="VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer3/Control"]
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer/Player2VBox/Control"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("6_hteqw")
+texture = ExtResource("2_khptj")
+expand_mode = 1
 stretch_mode = 5
 
-[node name="Panel2" type="Control" parent="VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer3"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.5
-
-[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer3/Panel2"]
+[node name="ReadyLabel" type="Label" parent="MarginContainer/HBoxContainer/Player2VBox/Control"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "Max
-"
+theme_override_colors/font_color = Color(0.909804, 0.94902, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = -2
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 5
+theme_override_font_sizes/font_size = 128
+text = "READY!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Panel" type="Panel" parent="VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer3"]
+[node name="NameLabel" type="Label" parent="MarginContainer/HBoxContainer/Player2VBox/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.909804, 0.94902, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = -2
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 5
+theme_override_font_sizes/font_size = 128
+text = " Robin "
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/Player2VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/Player2VBox/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="TitlePanel" type="Panel" parent="MarginContainer/HBoxContainer/Player2VBox/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+theme_override_styles/panel = ExtResource("4_l636c")
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Player2VBox/MarginContainer/VBoxContainer/TitlePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Powerup"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DescriptionPanel" type="Panel" parent="MarginContainer/HBoxContainer/Player2VBox/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = ExtResource("4_l636c")
 
-[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer3/Panel"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Player2VBox/MarginContainer/VBoxContainer/DescriptionPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

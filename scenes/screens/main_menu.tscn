@@ -52,9 +52,11 @@ text = ">"
 layout_mode = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 64
-text = "ASD for player 1. 
-Arrow keys for Player 2.
-Press Enter to Start!"
+text = "WASD + Space for player 1. 
+Arrow keys  + Enter for Player 2.
+Space/Enter to Start!"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="OptionsHBox" type="HBoxContainer" parent="CenterContainer/VBoxContainer/SelectorsCenter/SelectorsVBox"]
 visible = false
