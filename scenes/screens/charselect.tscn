@@ -72,6 +72,7 @@ horizontal_alignment = 1
 vertical_alignment = 2
 
 [node name="ReadyLabel" type="Label" parent="MarginContainer/HBoxContainer/Player1VBox/Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -275,6 +276,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="ReadyLabel" type="Label" parent="MarginContainer/HBoxContainer/Player2VBox/Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

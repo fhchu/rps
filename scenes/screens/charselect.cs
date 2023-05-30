@@ -116,28 +116,33 @@ public partial class charselect : ColorRect
     void selectCharacter(int player)
     {
         Control playerVbox;
+        Control readyLabel;
         if (player == PLAYER_1)
         {
             hasP1Selected = !hasP1Selected;
             playerVbox = p1VBox;
+            readyLabel = p1VBox.GetNode<Control>("Control/ReadyLabel");
+            readyLabel.Visible = hasP1Selected;
         }
         else
         {
             hasP2Selected = !hasP2Selected;
             playerVbox = p2VBox;
+            readyLabel = p2VBox.GetNode<Control>("Control/ReadyLabel");
+            readyLabel.Visible = hasP2Selected;
         }
 
         if (hasP1Selected && hasP2Selected)
         {
             PackedScene fightScene = (PackedScene)ResourceLoader.Load("res://scenes/screens/fight.tscn");
-
+            GetParent().AddChild(fightScene.Instantiate());
+            QueueFree();
         }
     }
 
     Vector2 getPosition(int location)
     {
         Vector2 position = playerSelect.GetChild<Control>(location).Position;
-        GD.Print(position);
 
         return position;
     }
